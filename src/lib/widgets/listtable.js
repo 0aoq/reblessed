@@ -39,11 +39,13 @@ function ListTable(options) {
   options.style.item = options.style.cell;
 
   var border = options.border;
-  if (border
-      && border.top === false
-      && border.bottom === false
-      && border.left === false
-      && border.right === false) {
+  if (
+    border &&
+    border.top === false &&
+    border.bottom === false &&
+    border.left === false &&
+    border.right === false
+  ) {
     delete options.border;
   }
 
@@ -61,7 +63,7 @@ function ListTable(options) {
     tags: options.parseTags || options.tags
   });
 
-  this.on('scroll', function() {
+  this.on('scroll', function () {
     self._header.setFront();
     self._header.rtop = self.childBase;
     if (!self.screen.autoPadding) {
@@ -69,17 +71,15 @@ function ListTable(options) {
     }
   });
 
-  this.pad = options.pad != null
-    ? options.pad
-    : 2;
+  this.pad = options.pad != null ? options.pad : 2;
 
   this.setData(options.rows || options.data);
 
-  this.on('attach', function() {
+  this.on('attach', function () {
     self.setData(self.rows);
   });
 
-  this.on('resize', function() {
+  this.on('resize', function () {
     var selected = self.selected;
     self.setData(self.rows);
     self.select(selected);
@@ -93,13 +93,12 @@ ListTable.prototype.type = 'list-table';
 
 ListTable.prototype._calculateMaxes = Table.prototype._calculateMaxes;
 
-ListTable.prototype.setRows =
-ListTable.prototype.setData = function(rows) {
-  var self = this
-    , align = this.__align
-    , selected = this.selected
-    , original = this.items.slice()
-    , sel = this.ritems[this.selected];
+ListTable.prototype.setRows = ListTable.prototype.setData = function (rows) {
+  var self = this,
+    align = this.__align,
+    selected = this.selected,
+    original = this.items.slice(),
+    sel = this.ritems[this.selected];
 
   if (this.visible && this.lpos) {
     this.clearPos();
@@ -115,10 +114,10 @@ ListTable.prototype.setData = function(rows) {
 
   this.addItem('');
 
-  this.rows.forEach(function(row, i) {
+  this.rows.forEach(function (row, i) {
     var isHeader = i === 0;
     var text = '';
-    row.forEach(function(cell, i) {
+    row.forEach(function (cell, i) {
       var width = self._maxes[i];
       var clen = self.strWidth(cell);
 
@@ -175,7 +174,7 @@ ListTable.prototype.setData = function(rows) {
 };
 
 ListTable.prototype._select = ListTable.prototype.select;
-ListTable.prototype.select = function(i) {
+ListTable.prototype.select = function (i) {
   if (i === 0) {
     i = 1;
   }
@@ -187,7 +186,7 @@ ListTable.prototype.select = function(i) {
   this.scrollTo(this.selected - 1);
 };
 
-ListTable.prototype.render = function() {
+ListTable.prototype.render = function () {
   var self = this;
 
   var coords = this._render();
@@ -197,12 +196,12 @@ ListTable.prototype.render = function() {
 
   if (!this._maxes) return coords;
 
-  var lines = this.screen.lines
-    , xi = coords.xi
-    , yi = coords.yi
-    , rx
-    , ry
-    , i;
+  var lines = this.screen.lines,
+    xi = coords.xi,
+    yi = coords.yi,
+    rx,
+    ry,
+    i;
 
   var battr = this.sattr(this.style.border);
 
@@ -220,7 +219,7 @@ ListTable.prototype.render = function() {
   for (i = 0; i < height + 1; i++) {
     if (!lines[yi + ry]) break;
     rx = 0;
-    self._maxes.slice(0, -1).forEach(function(max) {
+    self._maxes.slice(0, -1).forEach(function (max) {
       rx += max;
       if (!lines[yi + ry][xi + rx + 1]) return;
       // center
@@ -256,7 +255,7 @@ ListTable.prototype.render = function() {
   for (ry = 1; ry < height; ry++) {
     if (!lines[yi + ry]) break;
     rx = 0;
-    self._maxes.slice(0, -1).forEach(function(max) {
+    self._maxes.slice(0, -1).forEach(function (max) {
       rx += max;
       if (!lines[yi + ry][xi + rx + 1]) return;
       if (self.options.fillCellBorders !== false) {

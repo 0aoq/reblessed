@@ -50,11 +50,11 @@ for (var name of widget.classes) {
 }
 
 widget.aliases = {
-  'ListBar': 'Listbar',
-  'PNG': 'ANSIImage'
+  ListBar: 'Listbar',
+  PNG: 'ANSIImage'
 };
 
-Object.keys(widget.aliases).forEach(function(key) {
+Object.keys(widget.aliases).forEach(function (key) {
   var name = widget.aliases[key];
   widget[key] = widget[name];
   widget[key.toLowerCase()] = widget[name];

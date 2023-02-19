@@ -28,9 +28,9 @@ function StreamBox(options) {
 
   var self = this;
 
-  this.stream._read = function() {
+  this.stream._read = function () {
     self.setContent(self.stream.read().toString());
-  }
+  };
 }
 
 StreamBox.prototype.__proto__ = Element.prototype;

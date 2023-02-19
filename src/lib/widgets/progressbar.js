@@ -52,7 +52,7 @@ function ProgressBar(options) {
   this.orientation = options.orientation || 'horizontal';
 
   if (options.keys) {
-    this.on('keypress', function(ch, key) {
+    this.on('keypress', function (ch, key) {
       var back, forward;
       if (self.orientation === 'horizontal') {
         back = ['left', 'h'];
@@ -75,17 +75,17 @@ function ProgressBar(options) {
   }
 
   if (options.mouse) {
-    this.on('click', function(data) {
+    this.on('click', function (data) {
       var x, y, m, p;
       if (!self.lpos) return;
       if (self.orientation === 'horizontal') {
         x = data.x - self.lpos.xi;
-        m = (self.lpos.xl - self.lpos.xi) - self.iwidth;
-        p = x / m * 100 | 0;
+        m = self.lpos.xl - self.lpos.xi - self.iwidth;
+        p = ((x / m) * 100) | 0;
       } else if (self.orientation === 'vertical') {
         y = data.y - self.lpos.yi;
-        m = (self.lpos.yl - self.lpos.yi) - self.iheight;
-        p = y / m * 100 | 0;
+        m = self.lpos.yl - self.lpos.yi - self.iheight;
+        p = ((y / m) * 100) | 0;
       }
       self.setProgress(p);
     });
@@ -96,22 +96,22 @@ ProgressBar.prototype.__proto__ = Input.prototype;
 
 ProgressBar.prototype.type = 'progress-bar';
 
-ProgressBar.prototype.render = function() {
+ProgressBar.prototype.render = function () {
   var ret = this._render();
   if (!ret) return;
 
-  var xi = ret.xi
-    , xl = ret.xl
-    , yi = ret.yi
-    , yl = ret.yl
-    , dattr;
+  var xi = ret.xi,
+    xl = ret.xl,
+    yi = ret.yi,
+    yl = ret.yl,
+    dattr;
 
   if (this.border) xi++, yi++, xl--, yl--;
 
   if (this.orientation === 'horizontal') {
-    xl = xi + ((xl - xi) * (this.filled / 100)) | 0;
+    xl = (xi + (xl - xi) * (this.filled / 100)) | 0;
   } else if (this.orientation === 'vertical') {
-    yi = yi + ((yl - yi) - (((yl - yi) * (this.filled / 100)) | 0));
+    yi = yi + (yl - yi - (((yl - yi) * (this.filled / 100)) | 0));
   }
 
   dattr = this.sattr(this.style.bar);
@@ -129,7 +129,7 @@ ProgressBar.prototype.render = function() {
   return ret;
 };
 
-ProgressBar.prototype.progress = function(filled) {
+ProgressBar.prototype.progress = function (filled) {
   this.filled += filled;
   if (this.filled < 0) this.filled = 0;
   else if (this.filled > 100) this.filled = 100;
@@ -139,12 +139,12 @@ ProgressBar.prototype.progress = function(filled) {
   this.value = this.filled;
 };
 
-ProgressBar.prototype.setProgress = function(filled) {
+ProgressBar.prototype.setProgress = function (filled) {
   this.filled = 0;
   this.progress(filled);
 };
 
-ProgressBar.prototype.reset = function() {
+ProgressBar.prototype.reset = function () {
   this.emit('reset');
   this.filled = 0;
   this.value = this.filled;

@@ -19,9 +19,9 @@ var Terminal = require('./terminal');
  */
 
 function Video(options) {
-  var self = this
-    , shell
-    , args;
+  var self = this,
+    shell,
+    args;
 
   if (!(this instanceof Node)) {
     return new Video(options);
@@ -39,8 +39,7 @@ function Video(options) {
     args = ['--vo', 'caca', '--really-quiet', options.file];
   } else {
     this.parseTags = true;
-    this.setContent('{red-fg}{bold}Error:{/bold}'
-      + ' mplayer or mpv not installed.{/red-fg}');
+    this.setContent('{red-fg}{bold}Error:{/bold}' + ' mplayer or mpv not installed.{/red-fg}');
     return this;
   }
 
@@ -54,7 +53,7 @@ function Video(options) {
     args: args.slice()
   };
 
-  this.now = Date.now() / 1000 | 0;
+  this.now = (Date.now() / 1000) | 0;
   this.start = opts.start || 0;
   if (this.start) {
     if (shell === 'mplayer') {
@@ -69,13 +68,13 @@ function Video(options) {
   this.tty = new Terminal(opts);
   process.env.DISPLAY = DISPLAY;
 
-  this.on('click', function() {
+  this.on('click', function () {
     self.tty.pty.write('p');
   });
 
   // mplayer/mpv cannot resize itself in the terminal, so we have
   // to restart it at the correct start time.
-  this.on('resize', function() {
+  this.on('resize', function () {
     self.tty.destroy();
 
     var opts = {
@@ -88,8 +87,8 @@ function Video(options) {
       args: args.slice()
     };
 
-    var watched = (Date.now() / 1000 | 0) - self.now;
-    self.now = Date.now() / 1000 | 0;
+    var watched = ((Date.now() / 1000) | 0) - self.now;
+    self.now = (Date.now() / 1000) | 0;
     self.start += watched;
     if (shell === 'mplayer') {
       opts.args.unshift('-ss', self.start + '');
@@ -109,11 +108,13 @@ Video.prototype.__proto__ = Box.prototype;
 
 Video.prototype.type = 'video';
 
-Video.prototype.exists = function(program) {
+Video.prototype.exists = function (program) {
   try {
-    return !!+cp.execSync('type '
-      + program + ' > /dev/null 2> /dev/null'
-      + ' && echo 1', { encoding: 'utf8' }).trim();
+    return !!+cp
+      .execSync('type ' + program + ' > /dev/null 2> /dev/null' + ' && echo 1', {
+        encoding: 'utf8'
+      })
+      .trim();
   } catch (e) {
     return false;
   }

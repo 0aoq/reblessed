@@ -36,18 +36,16 @@ function Table(options) {
 
   Box.call(this, options);
 
-  this.pad = options.pad != null
-    ? options.pad
-    : 2;
+  this.pad = options.pad != null ? options.pad : 2;
 
   this.setData(options.rows || options.data);
 
-  this.on('attach', function() {
+  this.on('attach', function () {
     self.setContent('');
     self.setData(self.rows);
   });
 
-  this.on('resize', function() {
+  this.on('resize', function () {
     self.setContent('');
     self.setData(self.rows);
     self.screen.render();
@@ -58,7 +56,7 @@ Table.prototype.__proto__ = Box.prototype;
 
 Table.prototype.type = 'table';
 
-Table.prototype._calculateMaxes = function() {
+Table.prototype._calculateMaxes = function () {
   var self = this;
   var maxes = [];
 
@@ -66,8 +64,8 @@ Table.prototype._calculateMaxes = function() {
 
   this.rows = this.rows || [];
 
-  this.rows.forEach(function(row) {
-    row.forEach(function(cell, i) {
+  this.rows.forEach(function (row) {
+    row.forEach(function (cell, i) {
       var clen = self.strWidth(cell);
       if (!maxes[i] || maxes[i] < clen) {
         maxes[i] = clen;
@@ -75,7 +73,7 @@ Table.prototype._calculateMaxes = function() {
     });
   });
 
-  var total = maxes.reduce(function(total, max) {
+  var total = maxes.reduce(function (total, max) {
     return total + max;
   }, 0);
   total += maxes.length + 1;
@@ -89,28 +87,27 @@ Table.prototype._calculateMaxes = function() {
 
   if (this.position.width != null) {
     var missing = this.width - total;
-    var w = missing / maxes.length | 0;
+    var w = (missing / maxes.length) | 0;
     var wr = missing % maxes.length;
-    maxes = maxes.map(function(max, i) {
+    maxes = maxes.map(function (max, i) {
       if (i === maxes.length - 1) {
         return max + w + wr;
       }
       return max + w;
     });
   } else {
-    maxes = maxes.map(function(max) {
+    maxes = maxes.map(function (max) {
       return max + self.pad;
     });
   }
 
-  return this._maxes = maxes;
+  return (this._maxes = maxes);
 };
 
-Table.prototype.setRows =
-Table.prototype.setData = function(rows) {
-  var self = this
-    , text = ''
-    , align = this.align;
+Table.prototype.setRows = Table.prototype.setData = function (rows) {
+  var self = this,
+    text = '',
+    align = this.align;
 
   this.rows = rows || [];
 
@@ -118,9 +115,9 @@ Table.prototype.setData = function(rows) {
 
   if (!this._maxes) return;
 
-  this.rows.forEach(function(row, i) {
+  this.rows.forEach(function (row, i) {
     var isFooter = i === self.rows.length - 1;
-    row.forEach(function(cell, i) {
+    row.forEach(function (cell, i) {
       var width = self._maxes[i];
       var clen = self.strWidth(cell);
 
@@ -166,7 +163,7 @@ Table.prototype.setData = function(rows) {
   this.align = align;
 };
 
-Table.prototype.render = function() {
+Table.prototype.render = function () {
   var self = this;
 
   var coords = this._render();
@@ -176,20 +173,20 @@ Table.prototype.render = function() {
 
   if (!this._maxes) return coords;
 
-  var lines = this.screen.lines
-    , xi = coords.xi
-    , yi = coords.yi
-    , rx
-    , ry
-    , i;
+  var lines = this.screen.lines,
+    xi = coords.xi,
+    yi = coords.yi,
+    rx,
+    ry,
+    i;
 
-  var dattr = this.sattr(this.style)
-    , hattr = this.sattr(this.style.header)
-    , cattr = this.sattr(this.style.cell)
-    , battr = this.sattr(this.style.border);
+  var dattr = this.sattr(this.style),
+    hattr = this.sattr(this.style.header),
+    cattr = this.sattr(this.style.cell),
+    battr = this.sattr(this.style.border);
 
-  var width = coords.xl - coords.xi - this.iright
-    , height = coords.yl - coords.yi - this.ibottom;
+  var width = coords.xl - coords.xi - this.iright,
+    height = coords.yl - coords.yi - this.ibottom;
 
   // Apply attributes to header cells and cells.
   for (var y = this.itop; y < height; y++) {
@@ -214,7 +211,7 @@ Table.prototype.render = function() {
   for (i = 0; i < self.rows.length + 1; i++) {
     if (!lines[yi + ry]) break;
     rx = 0;
-    self._maxes.forEach(function(max, i) {
+    self._maxes.forEach(function (max, i) {
       rx += max;
       if (i === 0) {
         if (!lines[yi + ry][xi + 0]) return;
@@ -305,7 +302,7 @@ Table.prototype.render = function() {
   for (ry = 1; ry < self.rows.length * 2; ry++) {
     if (!lines[yi + ry]) break;
     rx = 0;
-    self._maxes.slice(0, -1).forEach(function(max) {
+    self._maxes.slice(0, -1).forEach(function (max) {
       rx += max;
       if (!lines[yi + ry][xi + rx + 1]) return;
       if (ry % 2 !== 0) {
@@ -324,7 +321,7 @@ Table.prototype.render = function() {
       }
     });
     rx = 1;
-    self._maxes.forEach(function(max) {
+    self._maxes.forEach(function (max) {
       while (max--) {
         if (ry % 2 === 0) {
           if (!lines[yi + ry]) break;

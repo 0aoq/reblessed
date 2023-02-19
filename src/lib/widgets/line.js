@@ -33,9 +33,12 @@ function Line(options) {
 
   Box.call(this, options);
 
-  this.ch = !options.type || options.type === 'line'
-    ? orientation === 'horizontal' ? '─' : '│'
-    : options.ch || ' ';
+  this.ch =
+    !options.type || options.type === 'line'
+      ? orientation === 'horizontal'
+        ? '─'
+        : '│'
+      : options.ch || ' ';
 
   this.border = {
     type: 'bg',

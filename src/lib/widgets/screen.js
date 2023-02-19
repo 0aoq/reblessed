@@ -8,13 +8,13 @@
  * Modules
  */
 
-var path = require('path')
-  , fs = require('fs')
-  , cp = require('child_process');
+var path = require('path'),
+  fs = require('fs'),
+  cp = require('child_process');
 
-var colors = require('../colors')
-  , program = require('../program')
-  , unicode = require('../unicode');
+var colors = require('../colors'),
+  program = require('../program'),
+  unicode = require('../unicode');
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
@@ -81,16 +81,20 @@ function Screen(options) {
   this._unicode = this.tput.unicode || this.tput.numbers.U8 === 1;
   this.fullUnicode = this.options.fullUnicode && this._unicode;
 
-  this.dattr = ((0 << 18) | (0x1ff << 9)) | 0x1ff;
+  this.dattr = (0 << 18) | (0x1ff << 9) | 0x1ff;
 
   this.renders = 0;
   this.position = {
-    left: this.left = this.aleft = this.rleft = 0,
-    right: this.right = this.aright = this.rright = 0,
-    top: this.top = this.atop = this.rtop = 0,
-    bottom: this.bottom = this.abottom = this.rbottom = 0,
-    get height() { return self.height; },
-    get width() { return self.width; }
+    left: (this.left = this.aleft = this.rleft = 0),
+    right: (this.right = this.aright = this.rright = 0),
+    top: (this.top = this.atop = this.rtop = 0),
+    bottom: (this.bottom = this.abottom = this.rbottom = 0),
+    get height() {
+      return self.height;
+    },
+    get width() {
+      return self.width;
+    }
   };
 
   this.ileft = 0;
@@ -139,7 +143,7 @@ function Screen(options) {
     _hidden: true
   };
 
-  this.program.on('resize', function() {
+  this.program.on('resize', function () {
     self.alloc();
     self.render();
     (function emit(el) {
@@ -148,15 +152,15 @@ function Screen(options) {
     })(self);
   });
 
-  this.program.on('focus', function() {
+  this.program.on('focus', function () {
     self.emit('focus');
   });
 
-  this.program.on('blur', function() {
+  this.program.on('blur', function () {
     self.emit('blur');
   });
 
-  this.program.on('warning', function(text) {
+  this.program.on('warning', function (text) {
     self.emit('warning', text);
   });
 
@@ -165,16 +169,18 @@ function Screen(options) {
       if (type === 'keypress' || type.indexOf('key ') === 0) self._listenKeys();
       if (type === 'mouse') self._listenMouse();
     }
-    if (type === 'mouse'
-      || type === 'click'
-      || type === 'mouseover'
-      || type === 'mouseout'
-      || type === 'mousedown'
-      || type === 'mouseup'
-      || type === 'mousewheel'
-      || type === 'wheeldown'
-      || type === 'wheelup'
-      || type === 'mousemove') {
+    if (
+      type === 'mouse' ||
+      type === 'click' ||
+      type === 'mouseover' ||
+      type === 'mouseout' ||
+      type === 'mousedown' ||
+      type === 'mouseup' ||
+      type === 'mousewheel' ||
+      type === 'wheeldown' ||
+      type === 'wheelup' ||
+      type === 'mousemove'
+    ) {
       self._listenMouse();
     }
   });
@@ -193,7 +199,7 @@ Screen.total = 0;
 
 Screen.instances = [];
 
-Screen.bind = function(screen) {
+Screen.bind = function (screen) {
   if (!Screen.global) {
     Screen.global = screen;
   }
@@ -207,61 +213,70 @@ Screen.bind = function(screen) {
   if (Screen._bound) return;
   Screen._bound = true;
 
-  process.on('uncaughtException', Screen._exceptionHandler = function(err) {
-    if (process.listeners('uncaughtException').length > 1) {
-      return;
-    }
-    Screen.instances.slice().forEach(function(screen) {
-      screen.destroy();
-    });
-    err = err || new Error('Uncaught Exception.');
-    console.error(err.stack ? err.stack + '' : err + '');
-    nextTick(function() {
-      process.exit(1);
-    });
-  });
-
-  ['SIGTERM', 'SIGINT', 'SIGQUIT'].forEach(function(signal) {
-    var name = '_' + signal.toLowerCase() + 'Handler';
-    process.on(signal, Screen[name] = function() {
-      if (process.listeners(signal).length > 1) {
+  process.on(
+    'uncaughtException',
+    (Screen._exceptionHandler = function (err) {
+      if (process.listeners('uncaughtException').length > 1) {
         return;
       }
-      nextTick(function() {
-        process.exit(0);
+      Screen.instances.slice().forEach(function (screen) {
+        screen.destroy();
       });
-    });
+      err = err || new Error('Uncaught Exception.');
+      console.error(err.stack ? err.stack + '' : err + '');
+      nextTick(function () {
+        process.exit(1);
+      });
+    })
+  );
+
+  ['SIGTERM', 'SIGINT', 'SIGQUIT'].forEach(function (signal) {
+    var name = '_' + signal.toLowerCase() + 'Handler';
+    process.on(
+      signal,
+      (Screen[name] = function () {
+        if (process.listeners(signal).length > 1) {
+          return;
+        }
+        nextTick(function () {
+          process.exit(0);
+        });
+      })
+    );
   });
 
-  process.on('exit', Screen._exitHandler = function() {
-    Screen.instances.slice().forEach(function(screen) {
-      screen.destroy();
-    });
-  });
+  process.on(
+    'exit',
+    (Screen._exitHandler = function () {
+      Screen.instances.slice().forEach(function (screen) {
+        screen.destroy();
+      });
+    })
+  );
 };
 
 Screen.prototype.__proto__ = Node.prototype;
 
 Screen.prototype.type = 'screen';
 
-Screen.prototype.__defineGetter__('title', function() {
+Screen.prototype.__defineGetter__('title', function () {
   return this.program.title;
 });
 
-Screen.prototype.__defineSetter__('title', function(title) {
-  return this.program.title = title;
+Screen.prototype.__defineSetter__('title', function (title) {
+  return (this.program.title = title);
 });
 
-Screen.prototype.__defineGetter__('terminal', function() {
+Screen.prototype.__defineGetter__('terminal', function () {
   return this.program.terminal;
 });
 
-Screen.prototype.__defineSetter__('terminal', function(terminal) {
+Screen.prototype.__defineSetter__('terminal', function (terminal) {
   this.setTerminal(terminal);
   return this.program.terminal;
 });
 
-Screen.prototype.setTerminal = function(terminal) {
+Screen.prototype.setTerminal = function (terminal) {
   var entered = !!this.program.isAlt;
   if (entered) {
     this._buf = '';
@@ -275,7 +290,7 @@ Screen.prototype.setTerminal = function(terminal) {
   }
 };
 
-Screen.prototype.enter = function() {
+Screen.prototype.enter = function () {
   if (this.program.isAlt) return;
   if (!this.cursor._set) {
     if (this.options.cursor.shape) {
@@ -288,9 +303,7 @@ Screen.prototype.enter = function() {
   if (process.platform === 'win32') {
     try {
       cp.execSync('cls', { stdio: 'ignore', timeout: 1000 });
-    } catch (e) {
-      ;
-    }
+    } catch (e) {}
   }
   this.program.alternateBuffer();
   this.program.put.keypad_xmit();
@@ -304,11 +317,10 @@ Screen.prototype.enter = function() {
   this.alloc();
 };
 
-Screen.prototype.leave = function() {
+Screen.prototype.leave = function () {
   if (!this.program.isAlt) return;
   this.program.put.keypad_local();
-  if (this.program.scrollTop !== 0
-      || this.program.scrollBottom !== this.rows - 1) {
+  if (this.program.scrollTop !== 0 || this.program.scrollBottom !== this.rows - 1) {
     this.program.csr(0, this.height - 1);
   }
   // XXX For some reason if alloc/clear() is before this
@@ -324,13 +336,11 @@ Screen.prototype.leave = function() {
   if (process.platform === 'win32') {
     try {
       cp.execSync('cls', { stdio: 'ignore', timeout: 1000 });
-    } catch (e) {
-      ;
-    }
+    } catch (e) {}
   }
 };
 
-Screen.prototype.postEnter = function() {
+Screen.prototype.postEnter = function () {
   var self = this;
   if (this.options.debug) {
     this.debugLog = new Log({
@@ -359,7 +369,7 @@ Screen.prototype.postEnter = function() {
       }
     });
 
-    this.debugLog.toggle = function() {
+    this.debugLog.toggle = function () {
       if (self.debugLog.hidden) {
         self.saveFocus();
         self.debugLog.show();
@@ -377,7 +387,7 @@ Screen.prototype.postEnter = function() {
   }
 
   if (this.options.warnings) {
-    this.on('warning', function(text) {
+    this.on('warning', function (text) {
       var warning = new Box({
         screen: self,
         parent: self,
@@ -394,7 +404,7 @@ Screen.prototype.postEnter = function() {
         tags: true
       });
       self.render();
-      var timeout = setTimeout(function() {
+      var timeout = setTimeout(function () {
         warning.destroy();
         self.render();
       }, 1500);
@@ -406,7 +416,7 @@ Screen.prototype.postEnter = function() {
 };
 
 Screen.prototype._destroy = Screen.prototype.destroy;
-Screen.prototype.destroy = function() {
+Screen.prototype.destroy = function () {
   this.leave();
 
   var index = Screen.instances.indexOf(this);
@@ -441,18 +451,18 @@ Screen.prototype.destroy = function() {
   this.program.destroy();
 };
 
-Screen.prototype.log = function() {
+Screen.prototype.log = function () {
   return this.program.log.apply(this.program, arguments);
 };
 
-Screen.prototype.debug = function() {
+Screen.prototype.debug = function () {
   if (this.debugLog) {
     this.debugLog.log.apply(this.debugLog, arguments);
   }
   return this.program.debug.apply(this.program, arguments);
 };
 
-Screen.prototype._listenMouse = function(el) {
+Screen.prototype._listenMouse = function (el) {
   var self = this;
 
   if (el && !~this.clickable.indexOf(el)) {
@@ -468,11 +478,11 @@ Screen.prototype._listenMouse = function(el) {
     this.program.setMouse({ sendFocus: true }, true);
   }
 
-  this.on('render', function() {
+  this.on('render', function () {
     self._needsClickableSort = true;
   });
 
-  this.program.on('mouse', function(data) {
+  this.program.on('mouse', function (data) {
     if (self.lockKeys) return;
 
     if (self._needsClickableSort) {
@@ -480,10 +490,10 @@ Screen.prototype._listenMouse = function(el) {
       self._needsClickableSort = false;
     }
 
-    var i = 0
-      , el
-      , set
-      , pos;
+    var i = 0,
+      el,
+      set,
+      pos;
 
     for (; i < self.clickable.length; i++) {
       el = self.clickable[i];
@@ -498,8 +508,7 @@ Screen.prototype._listenMouse = function(el) {
       pos = el.lpos;
       if (!pos) continue;
 
-      if (data.x >= pos.xi && data.x < pos.xl
-          && data.y >= pos.yi && data.y < pos.yl) {
+      if (data.x >= pos.xi && data.x < pos.xl && data.y >= pos.yi && data.y < pos.yl) {
         el.emit('mouse', data);
         if (data.action === 'mousedown') {
           self.mouseDown = el;
@@ -525,11 +534,11 @@ Screen.prototype._listenMouse = function(el) {
     }
 
     // Just mouseover?
-    if ((data.action === 'mousemove'
-        || data.action === 'mousedown'
-        || data.action === 'mouseup')
-        && self.hover
-        && !set) {
+    if (
+      (data.action === 'mousemove' || data.action === 'mousedown' || data.action === 'mouseup') &&
+      self.hover &&
+      !set
+    ) {
       self.hover.emit('mouseout', data);
       self.hover = null;
     }
@@ -550,18 +559,18 @@ Screen.prototype._listenMouse = function(el) {
   // });
 
   // Autofocus elements with the appropriate option.
-  this.on('element click', function(el) {
+  this.on('element click', function (el) {
     if (el.clickable === true && el.options.autoFocus !== false) {
       el.focus();
     }
   });
 };
 
-Screen.prototype.enableMouse = function(el) {
+Screen.prototype.enableMouse = function (el) {
   this._listenMouse(el);
 };
 
-Screen.prototype._listenKeys = function(el) {
+Screen.prototype._listenKeys = function (el) {
   var self = this;
 
   if (el && !~this.keyable.indexOf(el)) {
@@ -579,13 +588,13 @@ Screen.prototype._listenKeys = function(el) {
   // After the first keypress emitted, the handler
   // checks to make sure grabKeys, lockKeys, and focused
   // weren't changed, and handles those situations appropriately.
-  this.program.on('keypress', function(ch, key) {
+  this.program.on('keypress', function (ch, key) {
     if (self.lockKeys && !~self.ignoreLocked.indexOf(key.full)) {
       return;
     }
 
-    var focused = self.focused
-      , grabKeys = self.grabKeys;
+    var focused = self.focused,
+      grabKeys = self.grabKeys;
 
     if (!grabKeys || ~self.ignoreLocked.indexOf(key.full)) {
       self.emit('keypress', ch, key);
@@ -604,16 +613,16 @@ Screen.prototype._listenKeys = function(el) {
   });
 };
 
-Screen.prototype.enableKeys = function(el) {
+Screen.prototype.enableKeys = function (el) {
   this._listenKeys(el);
 };
 
-Screen.prototype.enableInput = function(el) {
+Screen.prototype.enableInput = function (el) {
   this._listenMouse(el);
   this._listenKeys(el);
 };
 
-Screen.prototype._initHover = function() {
+Screen.prototype._initHover = function () {
   var self = this;
 
   if (this._hoverText) {
@@ -637,14 +646,14 @@ Screen.prototype._initHover = function() {
     }
   });
 
-  this.on('mousemove', function(data) {
+  this.on('mousemove', function (data) {
     if (self._hoverText.detached) return;
     self._hoverText.rleft = data.x + 1;
     self._hoverText.rtop = data.y;
     self.render();
   });
 
-  this.on('element mouseover', function(el, data) {
+  this.on('element mouseover', function (el, data) {
     if (!el._hoverOptions) return;
     self._hoverText.parseTags = el.parseTags;
     self._hoverText.setContent(el._hoverOptions.text);
@@ -654,7 +663,7 @@ Screen.prototype._initHover = function() {
     self.render();
   });
 
-  this.on('element mouseout', function() {
+  this.on('element mouseout', function () {
     if (self._hoverText.detached) return;
     self._hoverText.detach();
     self.render();
@@ -663,7 +672,7 @@ Screen.prototype._initHover = function() {
   // XXX This can cause problems if the
   // terminal does not support allMotion.
   // Workaround: check to see if content is set.
-  this.on('element mouseup', function(el) {
+  this.on('element mouseup', function (el) {
     if (!self._hoverText.getContent()) return;
     if (!el._hoverOptions) return;
     self.append(self._hoverText);
@@ -671,23 +680,23 @@ Screen.prototype._initHover = function() {
   });
 };
 
-Screen.prototype.__defineGetter__('cols', function() {
+Screen.prototype.__defineGetter__('cols', function () {
   return this.program.cols;
 });
 
-Screen.prototype.__defineGetter__('rows', function() {
+Screen.prototype.__defineGetter__('rows', function () {
   return this.program.rows;
 });
 
-Screen.prototype.__defineGetter__('width', function() {
+Screen.prototype.__defineGetter__('width', function () {
   return this.program.cols;
 });
 
-Screen.prototype.__defineGetter__('height', function() {
+Screen.prototype.__defineGetter__('height', function () {
   return this.program.rows;
 });
 
-Screen.prototype.alloc = function(dirty) {
+Screen.prototype.alloc = function (dirty) {
   var x, y;
 
   this.lines = [];
@@ -710,11 +719,11 @@ Screen.prototype.alloc = function(dirty) {
   this.program.clear();
 };
 
-Screen.prototype.realloc = function() {
+Screen.prototype.realloc = function () {
   return this.alloc(true);
 };
 
-Screen.prototype.render = function() {
+Screen.prototype.render = function () {
   var self = this;
 
   if (this.destroyed) return;
@@ -731,7 +740,7 @@ Screen.prototype.render = function() {
   // be some overhead though.
   // this.screen.clearRegion(0, this.cols, 0, this.rows);
   this._ci = 0;
-  this.children.forEach(function(el) {
+  this.children.forEach(function (el) {
     el.index = self._ci++;
     //el._rendering = true;
     el.render();
@@ -756,7 +765,7 @@ Screen.prototype.render = function() {
   this.emit('render');
 };
 
-Screen.prototype.blankLine = function(ch, dirty) {
+Screen.prototype.blankLine = function (ch, dirty) {
   var out = [];
   for (var x = 0; x < this.cols; x++) {
     out[x] = [this.dattr, ch || ' '];
@@ -765,12 +774,15 @@ Screen.prototype.blankLine = function(ch, dirty) {
   return out;
 };
 
-Screen.prototype.insertLine = function(n, y, top, bottom) {
+Screen.prototype.insertLine = function (n, y, top, bottom) {
   // if (y === top) return this.insertLineNC(n, y, top, bottom);
 
-  if (!this.tput.strings.change_scroll_region
-      || !this.tput.strings.delete_line
-      || !this.tput.strings.insert_line) return;
+  if (
+    !this.tput.strings.change_scroll_region ||
+    !this.tput.strings.delete_line ||
+    !this.tput.strings.insert_line
+  )
+    return;
 
   this._buf += this.tput.csr(top, bottom);
   this._buf += this.tput.cup(y, 0);
@@ -787,12 +799,15 @@ Screen.prototype.insertLine = function(n, y, top, bottom) {
   }
 };
 
-Screen.prototype.deleteLine = function(n, y, top, bottom) {
+Screen.prototype.deleteLine = function (n, y, top, bottom) {
   // if (y === top) return this.deleteLineNC(n, y, top, bottom);
 
-  if (!this.tput.strings.change_scroll_region
-      || !this.tput.strings.delete_line
-      || !this.tput.strings.insert_line) return;
+  if (
+    !this.tput.strings.change_scroll_region ||
+    !this.tput.strings.delete_line ||
+    !this.tput.strings.insert_line
+  )
+    return;
 
   this._buf += this.tput.csr(top, bottom);
   this._buf += this.tput.cup(y, 0);
@@ -812,9 +827,8 @@ Screen.prototype.deleteLine = function(n, y, top, bottom) {
 // This is how ncurses does it.
 // Scroll down (up cursor-wise).
 // This will only work for top line deletion as opposed to arbitrary lines.
-Screen.prototype.insertLineNC = function(n, y, top, bottom) {
-  if (!this.tput.strings.change_scroll_region
-      || !this.tput.strings.delete_line) return;
+Screen.prototype.insertLineNC = function (n, y, top, bottom) {
+  if (!this.tput.strings.change_scroll_region || !this.tput.strings.delete_line) return;
 
   this._buf += this.tput.csr(top, bottom);
   this._buf += this.tput.cup(top, 0);
@@ -834,9 +848,8 @@ Screen.prototype.insertLineNC = function(n, y, top, bottom) {
 // This is how ncurses does it.
 // Scroll up (down cursor-wise).
 // This will only work for bottom line deletion as opposed to arbitrary lines.
-Screen.prototype.deleteLineNC = function(n, y, top, bottom) {
-  if (!this.tput.strings.change_scroll_region
-      || !this.tput.strings.delete_line) return;
+Screen.prototype.deleteLineNC = function (n, y, top, bottom) {
+  if (!this.tput.strings.change_scroll_region || !this.tput.strings.delete_line) return;
 
   this._buf += this.tput.csr(top, bottom);
   this._buf += this.tput.cup(bottom, 0);
@@ -853,19 +866,19 @@ Screen.prototype.deleteLineNC = function(n, y, top, bottom) {
   }
 };
 
-Screen.prototype.insertBottom = function(top, bottom) {
+Screen.prototype.insertBottom = function (top, bottom) {
   return this.deleteLine(1, top, top, bottom);
 };
 
-Screen.prototype.insertTop = function(top, bottom) {
+Screen.prototype.insertTop = function (top, bottom) {
   return this.insertLine(1, top, top, bottom);
 };
 
-Screen.prototype.deleteBottom = function(top, bottom) {
+Screen.prototype.deleteBottom = function (top, bottom) {
   return this.clearRegion(0, this.width, bottom, bottom);
 };
 
-Screen.prototype.deleteTop = function(top, bottom) {
+Screen.prototype.deleteTop = function (top, bottom) {
   // Same as: return this.insertBottom(top, bottom);
   return this.deleteLine(1, top, top, bottom);
 };
@@ -879,7 +892,7 @@ Screen.prototype.deleteTop = function(top, bottom) {
 // but will it be less or greater than the
 // performance hit of slow-rendering scrollable
 // boxes with clean sides?
-Screen.prototype.cleanSides = function(el) {
+Screen.prototype.cleanSides = function (el) {
   var pos = el.lpos;
 
   if (!pos) {
@@ -891,17 +904,17 @@ Screen.prototype.cleanSides = function(el) {
   }
 
   if (pos.xi <= 0 && pos.xl >= this.width) {
-    return pos._cleanSides = true;
+    return (pos._cleanSides = true);
   }
 
   if (this.options.fastCSR) {
     // Maybe just do this instead of parsing.
-    if (pos.yi < 0) return pos._cleanSides = false;
-    if (pos.yl > this.height) return pos._cleanSides = false;
+    if (pos.yi < 0) return (pos._cleanSides = false);
+    if (pos.yl > this.height) return (pos._cleanSides = false);
     if (this.width - (pos.xl - pos.xi) < 40) {
-      return pos._cleanSides = true;
+      return (pos._cleanSides = true);
     }
-    return pos._cleanSides = false;
+    return (pos._cleanSides = false);
   }
 
   if (!this.options.smartCSR) {
@@ -920,17 +933,17 @@ Screen.prototype.cleanSides = function(el) {
   //   return pos._cleanSides = false;
   // }
 
-  var yi = pos.yi + el.itop
-    , yl = pos.yl - el.ibottom
-    , first
-    , ch
-    , x
-    , y;
+  var yi = pos.yi + el.itop,
+    yl = pos.yl - el.ibottom,
+    first,
+    ch,
+    x,
+    y;
 
-  if (pos.yi < 0) return pos._cleanSides = false;
-  if (pos.yl > this.height) return pos._cleanSides = false;
-  if (pos.xi - 1 < 0) return pos._cleanSides = true;
-  if (pos.xl > this.width) return pos._cleanSides = true;
+  if (pos.yi < 0) return (pos._cleanSides = false);
+  if (pos.yl > this.height) return (pos._cleanSides = false);
+  if (pos.xi - 1 < 0) return (pos._cleanSides = true);
+  if (pos.xl > this.width) return (pos._cleanSides = true);
 
   for (x = pos.xi - 1; x >= 0; x--) {
     if (!this.olines[yi]) break;
@@ -939,7 +952,7 @@ Screen.prototype.cleanSides = function(el) {
       if (!this.olines[y] || !this.olines[y][x]) break;
       ch = this.olines[y][x];
       if (ch[0] !== first[0] || ch[1] !== first[1]) {
-        return pos._cleanSides = false;
+        return (pos._cleanSides = false);
       }
     }
   }
@@ -951,21 +964,21 @@ Screen.prototype.cleanSides = function(el) {
       if (!this.olines[y] || !this.olines[y][x]) break;
       ch = this.olines[y][x];
       if (ch[0] !== first[0] || ch[1] !== first[1]) {
-        return pos._cleanSides = false;
+        return (pos._cleanSides = false);
       }
     }
   }
 
-  return pos._cleanSides = true;
+  return (pos._cleanSides = true);
 };
 
-Screen.prototype._dockBorders = function() {
-  var lines = this.lines
-    , stops = this._borderStops
-    , i
-    , y
-    , x
-    , ch;
+Screen.prototype._dockBorders = function () {
+  var lines = this.lines,
+    stops = this._borderStops,
+    i,
+    y,
+    x,
+    ch;
 
   // var keys, stop;
   //
@@ -980,8 +993,12 @@ Screen.prototype._dockBorders = function() {
   //   for (x = stop.xi; x < stop.xl; x++) {
 
   stops = Object.keys(stops)
-    .map(function(k) { return +k; })
-    .sort(function(a, b) { return a - b; });
+    .map(function (k) {
+      return +k;
+    })
+    .sort(function (a, b) {
+      return a - b;
+    });
 
   for (i = 0; i < stops.length; i++) {
     y = stops[i];
@@ -996,10 +1013,10 @@ Screen.prototype._dockBorders = function() {
   }
 };
 
-Screen.prototype._getAngle = function(lines, x, y) {
-  var angle = 0
-    , attr = lines[y][x][0]
-    , ch = lines[y][x][1];
+Screen.prototype._getAngle = function (lines, x, y) {
+  var angle = 0,
+    attr = lines[y][x][0],
+    ch = lines[y][x][1];
 
   if (lines[y][x - 1] && langles[lines[y][x - 1][1]]) {
     if (!this.options.ignoreDockContrast) {
@@ -1049,31 +1066,20 @@ Screen.prototype._getAngle = function(lines, x, y) {
   return angleTable[angle] || ch;
 };
 
-Screen.prototype.draw = function(start, end) {
+Screen.prototype.draw = function (start, end) {
   // this.emit('predraw');
 
-  var x
-    , y
-    , line
-    , out
-    , ch
-    , data
-    , attr
-    , fg
-    , bg
-    , flags;
+  var x, y, line, out, ch, data, attr, fg, bg, flags;
 
-  var main = ''
-    , pre
-    , post;
+  var main = '',
+    pre,
+    post;
 
-  var clr
-    , neq
-    , xx;
+  var clr, neq, xx;
 
-  var lx = -1
-    , ly = -1
-    , o;
+  var lx = -1,
+    ly = -1,
+    o;
 
   var acs;
 
@@ -1099,11 +1105,13 @@ Screen.prototype.draw = function(start, end) {
       ch = line[x][1];
 
       // Render the artificial cursor.
-      if (this.cursor.artificial
-          && !this.cursor._hidden
-          && this.cursor._state
-          && x === this.program.x
-          && y === this.program.y) {
+      if (
+        this.cursor.artificial &&
+        !this.cursor._hidden &&
+        this.cursor._state &&
+        x === this.program.x &&
+        y === this.program.y
+      ) {
         var cattr = this._cursorAttr(this.cursor, data);
         if (cattr.ch) ch = cattr.ch;
         data = cattr.attr;
@@ -1112,11 +1120,12 @@ Screen.prototype.draw = function(start, end) {
       // Take advantage of xterm's back_color_erase feature by using a
       // lookahead. Stop spitting out so many damn spaces. NOTE: Is checking
       // the bg for non BCE terminals worth the overhead?
-      if (this.options.useBCE
-          && ch === ' '
-          && (this.tput.bools.back_color_erase
-          || (data & 0x1ff) === (this.dattr & 0x1ff))
-          && ((data >> 18) & 8) === ((this.dattr >> 18) & 8)) {
+      if (
+        this.options.useBCE &&
+        ch === ' ' &&
+        (this.tput.bools.back_color_erase || (data & 0x1ff) === (this.dattr & 0x1ff)) &&
+        ((data >> 18) & 8) === ((this.dattr >> 18) & 8)
+      ) {
         clr = true;
         neq = false;
 
@@ -1131,7 +1140,7 @@ Screen.prototype.draw = function(start, end) {
         }
 
         if (clr && neq) {
-          lx = -1, ly = -1;
+          (lx = -1), (ly = -1);
           if (data !== attr) {
             out += this.codeAttr(data);
             attr = data;
@@ -1201,13 +1210,11 @@ Screen.prototype.draw = function(start, end) {
         continue;
       } else if (lx !== -1) {
         if (this.tput.strings.parm_right_cursor) {
-          out += y === ly
-            ? this.tput.cuf(x - lx)
-            : this.tput.cup(y, x);
+          out += y === ly ? this.tput.cuf(x - lx) : this.tput.cup(y, x);
         } else {
           out += this.tput.cup(y, x);
         }
-        lx = -1, ly = -1;
+        (lx = -1), (ly = -1);
       }
       o[x][0] = data;
       o[x][1] = ch;
@@ -1324,8 +1331,11 @@ Screen.prototype.draw = function(start, end) {
       // supports UTF8, but I imagine it's unlikely.
       // Maybe remove !this.tput.unicode check, however,
       // this seems to be the way ncurses does it.
-      if (this.tput.strings.enter_alt_charset_mode
-          && !this.tput.brokenACS && (this.tput.acscr[ch] || acs)) {
+      if (
+        this.tput.strings.enter_alt_charset_mode &&
+        !this.tput.brokenACS &&
+        (this.tput.acscr[ch] || acs)
+      ) {
         // Fun fact: even if this.tput.brokenACS wasn't checked here,
         // the linux console would still work fine because the acs
         // table would fail the check of: this.tput.acscr[ch]
@@ -1333,8 +1343,7 @@ Screen.prototype.draw = function(start, end) {
           if (acs) {
             ch = this.tput.acscr[ch];
           } else {
-            ch = this.tput.smacs()
-              + this.tput.acscr[ch];
+            ch = this.tput.smacs() + this.tput.acscr[ch];
             acs = true;
           }
         } else if (acs) {
@@ -1395,17 +1404,17 @@ Screen.prototype.draw = function(start, end) {
   // this.emit('draw');
 };
 
-Screen.prototype._reduceColor = function(color) {
+Screen.prototype._reduceColor = function (color) {
   return colors.reduce(color, this.tput.colors);
 };
 
 // Convert an SGR string to our own attribute format.
-Screen.prototype.attrCode = function(code, cur, def) {
-  var flags = (cur >> 18) & 0x1ff
-    , fg = (cur >> 9) & 0x1ff
-    , bg = cur & 0x1ff
-    , c
-    , i;
+Screen.prototype.attrCode = function (code, cur, def) {
+  var flags = (cur >> 18) & 0x1ff,
+    fg = (cur >> 9) & 0x1ff,
+    bg = cur & 0x1ff,
+    c,
+    i;
 
   code = code.slice(2, -1).split(';');
   if (!code[0]) code[0] = '0';
@@ -1459,23 +1468,23 @@ Screen.prototype.attrCode = function(code, cur, def) {
         bg = def & 0x1ff;
         break;
       default: // color
-        if (c === 48 && +code[i+1] === 5) {
+        if (c === 48 && +code[i + 1] === 5) {
           i += 2;
           bg = +code[i];
           break;
-        } else if (c === 48 && +code[i+1] === 2) {
+        } else if (c === 48 && +code[i + 1] === 2) {
           i += 2;
-          bg = colors.match(+code[i], +code[i+1], +code[i+2]);
+          bg = colors.match(+code[i], +code[i + 1], +code[i + 2]);
           if (bg === -1) bg = def & 0x1ff;
           i += 2;
           break;
-        } else if (c === 38 && +code[i+1] === 5) {
+        } else if (c === 38 && +code[i + 1] === 5) {
           i += 2;
           fg = +code[i];
           break;
-        } else if (c === 38 && +code[i+1] === 2) {
+        } else if (c === 38 && +code[i + 1] === 2) {
           i += 2;
-          fg = colors.match(+code[i], +code[i+1], +code[i+2]);
+          fg = colors.match(+code[i], +code[i + 1], +code[i + 2]);
           if (fg === -1) fg = (def >> 9) & 0x1ff;
           i += 2;
           break;
@@ -1506,11 +1515,11 @@ Screen.prototype.attrCode = function(code, cur, def) {
 };
 
 // Convert our own attribute format to an SGR string.
-Screen.prototype.codeAttr = function(code) {
-  var flags = (code >> 18) & 0x1ff
-    , fg = (code >> 9) & 0x1ff
-    , bg = code & 0x1ff
-    , out = '';
+Screen.prototype.codeAttr = function (code) {
+  var flags = (code >> 18) & 0x1ff,
+    fg = (code >> 9) & 0x1ff,
+    bg = code & 0x1ff,
+    out = '';
 
   // bold
   if (flags & 1) {
@@ -1572,8 +1581,8 @@ Screen.prototype.codeAttr = function(code) {
   return '\x1b[' + out + 'm';
 };
 
-Screen.prototype.focusOffset = function(offset) {
-  var shown = this.keyable.filter(function(el) {
+Screen.prototype.focusOffset = function (offset) {
+  var shown = this.keyable.filter(function (el) {
     return !el.detached && el.visible;
   }).length;
 
@@ -1600,16 +1609,15 @@ Screen.prototype.focusOffset = function(offset) {
   return this.keyable[i].focus();
 };
 
-Screen.prototype.focusPrev =
-Screen.prototype.focusPrevious = function() {
+Screen.prototype.focusPrev = Screen.prototype.focusPrevious = function () {
   return this.focusOffset(-1);
 };
 
-Screen.prototype.focusNext = function() {
+Screen.prototype.focusNext = function () {
   return this.focusOffset(1);
 };
 
-Screen.prototype.focusPush = function(el) {
+Screen.prototype.focusPush = function (el) {
   if (!el) return;
   var old = this.history[this.history.length - 1];
   if (this.history.length === 10) {
@@ -1619,7 +1627,7 @@ Screen.prototype.focusPush = function(el) {
   this._focus(el, old);
 };
 
-Screen.prototype.focusPop = function() {
+Screen.prototype.focusPop = function () {
   var old = this.history.pop();
   if (this.history.length) {
     this._focus(this.history[this.history.length - 1], old);
@@ -1627,20 +1635,20 @@ Screen.prototype.focusPop = function() {
   return old;
 };
 
-Screen.prototype.saveFocus = function() {
-  return this._savedFocus = this.focused;
+Screen.prototype.saveFocus = function () {
+  return (this._savedFocus = this.focused);
 };
 
-Screen.prototype.restoreFocus = function() {
+Screen.prototype.restoreFocus = function () {
   if (!this._savedFocus) return;
   this._savedFocus.focus();
   delete this._savedFocus;
   return this.focused;
 };
 
-Screen.prototype.rewindFocus = function() {
-  var old = this.history.pop()
-    , el;
+Screen.prototype.rewindFocus = function () {
+  var old = this.history.pop(),
+    el;
 
   while (this.history.length) {
     el = this.history.pop();
@@ -1656,10 +1664,10 @@ Screen.prototype.rewindFocus = function() {
   }
 };
 
-Screen.prototype._focus = function(self, old) {
+Screen.prototype._focus = function (self, old) {
   // Find a scrollable ancestor if we have one.
   var el = self;
-  while (el = el.parent) {
+  while ((el = el.parent)) {
     if (el.scrollable) break;
   }
 
@@ -1688,22 +1696,22 @@ Screen.prototype._focus = function(self, old) {
   self.emit('focus', old);
 };
 
-Screen.prototype.__defineGetter__('focused', function() {
+Screen.prototype.__defineGetter__('focused', function () {
   return this.history[this.history.length - 1];
 });
 
-Screen.prototype.__defineSetter__('focused', function(el) {
+Screen.prototype.__defineSetter__('focused', function (el) {
   return this.focusPush(el);
 });
 
-Screen.prototype.clearRegion = function(xi, xl, yi, yl, override) {
+Screen.prototype.clearRegion = function (xi, xl, yi, yl, override) {
   return this.fillRegion(this.dattr, ' ', xi, xl, yi, yl, override);
 };
 
-Screen.prototype.fillRegion = function(attr, ch, xi, xl, yi, yl, override) {
-  var lines = this.lines
-    , cell
-    , xx;
+Screen.prototype.fillRegion = function (attr, ch, xi, xl, yi, yl, override) {
+  var lines = this.lines,
+    cell,
+    xx;
 
   if (xi < 0) xi = 0;
   if (yi < 0) yi = 0;
@@ -1722,30 +1730,29 @@ Screen.prototype.fillRegion = function(attr, ch, xi, xl, yi, yl, override) {
   }
 };
 
-Screen.prototype.key = function() {
+Screen.prototype.key = function () {
   return this.program.key.apply(this, arguments);
 };
 
-Screen.prototype.onceKey = function() {
+Screen.prototype.onceKey = function () {
   return this.program.onceKey.apply(this, arguments);
 };
 
-Screen.prototype.unkey =
-Screen.prototype.removeKey = function() {
+Screen.prototype.unkey = Screen.prototype.removeKey = function () {
   return this.program.unkey.apply(this, arguments);
 };
 
-Screen.prototype.spawn = function(file, args, options) {
+Screen.prototype.spawn = function (file, args, options) {
   if (!Array.isArray(args)) {
     options = args;
     args = [];
   }
 
-  var screen = this
-    , program = screen.program
-    , spawn = require('child_process').spawn
-    , mouse = program.mouseEnabled
-    , ps;
+  var screen = this,
+    program = screen.program,
+    spawn = require('child_process').spawn,
+    mouse = program.mouseEnabled,
+    ps;
 
   options = options || {};
 
@@ -1758,13 +1765,13 @@ Screen.prototype.spawn = function(file, args, options) {
   if (mouse) program.disableMouse();
 
   var write = program.output.write;
-  program.output.write = function() {};
+  program.output.write = function () {};
   program.input.pause();
   if (program.input.setRawMode) {
     program.input.setRawMode(false);
   }
 
-  var resume = function() {
+  var resume = function () {
     if (resume.done) return;
     resume.done = true;
 
@@ -1798,15 +1805,15 @@ Screen.prototype.spawn = function(file, args, options) {
   return ps;
 };
 
-Screen.prototype.exec = function(file, args, options, callback) {
+Screen.prototype.exec = function (file, args, options, callback) {
   var ps = this.spawn(file, args, options);
 
-  ps.on('error', function(err) {
+  ps.on('error', function (err) {
     if (!callback) return;
     return callback(err, false);
   });
 
-  ps.on('exit', function(code) {
+  ps.on('exit', function (code) {
     if (!callback) return;
     return callback(null, code === 0);
   });
@@ -1814,7 +1821,7 @@ Screen.prototype.exec = function(file, args, options, callback) {
   return ps;
 };
 
-Screen.prototype.readEditor = function(options, callback) {
+Screen.prototype.readEditor = function (options, callback) {
   if (typeof options === 'string') {
     options = { editor: options };
   }
@@ -1825,18 +1832,18 @@ Screen.prototype.readEditor = function(options, callback) {
   }
 
   if (!callback) {
-    callback = function() {};
+    callback = function () {};
   }
 
   options = options || {};
 
-  var self = this
-    , editor = options.editor || process.env.EDITOR || 'vi'
-    , name = options.name || process.title || 'blessed'
-    , rnd = Math.random().toString(36).split('.').pop()
-    , file = '/tmp/' + name + '.' + rnd
-    , args = [file]
-    , opt;
+  var self = this,
+    editor = options.editor || process.env.EDITOR || 'vi',
+    name = options.name || process.title || 'blessed',
+    rnd = Math.random().toString(36).split('.').pop(),
+    file = '/tmp/' + name + '.' + rnd,
+    args = [file],
+    opt;
 
   opt = {
     stdio: 'inherit',
@@ -1849,12 +1856,12 @@ Screen.prototype.readEditor = function(options, callback) {
     return fs.writeFile(file, options.value, callback);
   }
 
-  return writeFile(function(err) {
+  return writeFile(function (err) {
     if (err) return callback(err);
-    return self.exec(editor, args, opt, function(err, success) {
+    return self.exec(editor, args, opt, function (err, success) {
       if (err) return callback(err);
-      return fs.readFile(file, 'utf8', function(err, data) {
-        return fs.unlink(file, function() {
+      return fs.readFile(file, 'utf8', function (err, data) {
+        return fs.unlink(file, function () {
           if (!success) return callback(new Error('Unsuccessful.'));
           if (err) return callback(err);
           return callback(null, data);
@@ -1864,7 +1871,7 @@ Screen.prototype.readEditor = function(options, callback) {
   });
 };
 
-Screen.prototype.displayImage = function(file, callback) {
+Screen.prototype.displayImage = function (file, callback) {
   if (!file) {
     if (!callback) return;
     return callback(new Error('No image.'));
@@ -1878,8 +1885,7 @@ Screen.prototype.displayImage = function(file, callback) {
 
   var args = ['w3m', '-T', 'text/html'];
 
-  var input = '<title>press q to exit</title>'
-    + '<img align="center" src="' + file + '">';
+  var input = '<title>press q to exit</title>' + '<img align="center" src="' + file + '">';
 
   var opt = {
     stdio: ['pipe', 1, 2],
@@ -1889,12 +1895,12 @@ Screen.prototype.displayImage = function(file, callback) {
 
   var ps = this.spawn(args[0], args.slice(1), opt);
 
-  ps.on('error', function(err) {
+  ps.on('error', function (err) {
     if (!callback) return;
     return callback(err);
   });
 
-  ps.on('exit', function(code) {
+  ps.on('exit', function (code) {
     if (!callback) return;
     if (code !== 0) return callback(new Error('Exit Code: ' + code));
     return callback(null, code === 0);
@@ -1904,7 +1910,7 @@ Screen.prototype.displayImage = function(file, callback) {
   ps.stdin.end();
 };
 
-Screen.prototype.setEffects = function(el, fel, over, out, effects, temp) {
+Screen.prototype.setEffects = function (el, fel, over, out, effects, temp) {
   if (!effects) return;
 
   var tmp = {};
@@ -1912,17 +1918,19 @@ Screen.prototype.setEffects = function(el, fel, over, out, effects, temp) {
 
   if (typeof el !== 'function') {
     var _el = el;
-    el = function() { return _el; };
+    el = function () {
+      return _el;
+    };
   }
 
-  fel.on(over, function() {
+  fel.on(over, function () {
     var element = el();
-    Object.keys(effects).forEach(function(key) {
+    Object.keys(effects).forEach(function (key) {
       var val = effects[key];
       if (val !== null && typeof val === 'object') {
         tmp[key] = tmp[key] || {};
         // element.style[key] = element.style[key] || {};
-        Object.keys(val).forEach(function(k) {
+        Object.keys(val).forEach(function (k) {
           var v = val[k];
           tmp[key][k] = element.style[key][k];
           element.style[key][k] = v;
@@ -1935,14 +1943,14 @@ Screen.prototype.setEffects = function(el, fel, over, out, effects, temp) {
     element.screen.render();
   });
 
-  fel.on(out, function() {
+  fel.on(out, function () {
     var element = el();
-    Object.keys(effects).forEach(function(key) {
+    Object.keys(effects).forEach(function (key) {
       var val = effects[key];
       if (val !== null && typeof val === 'object') {
         tmp[key] = tmp[key] || {};
         // element.style[key] = element.style[key] || {};
-        Object.keys(val).forEach(function(k) {
+        Object.keys(val).forEach(function (k) {
           if (tmp[key].hasOwnProperty(k)) {
             element.style[key][k] = tmp[key][k];
           }
@@ -1957,9 +1965,9 @@ Screen.prototype.setEffects = function(el, fel, over, out, effects, temp) {
   });
 };
 
-Screen.prototype.sigtstp = function(callback) {
+Screen.prototype.sigtstp = function (callback) {
   var self = this;
-  this.program.sigtstp(function() {
+  this.program.sigtstp(function () {
     self.alloc();
     self.render();
     self.program.lrestoreCursor('pause', true);
@@ -1967,11 +1975,11 @@ Screen.prototype.sigtstp = function(callback) {
   });
 };
 
-Screen.prototype.copyToClipboard = function(text) {
+Screen.prototype.copyToClipboard = function (text) {
   return this.program.copyToClipboard(text);
 };
 
-Screen.prototype.cursorShape = function(shape, blink) {
+Screen.prototype.cursorShape = function (shape, blink) {
   var self = this;
 
   this.cursor.shape = shape || 'block';
@@ -1982,7 +1990,7 @@ Screen.prototype.cursorShape = function(shape, blink) {
     if (!this.program.hideCursor_old) {
       var hideCursor = this.program.hideCursor;
       this.program.hideCursor_old = this.program.hideCursor;
-      this.program.hideCursor = function() {
+      this.program.hideCursor = function () {
         hideCursor.call(self.program);
         self.cursor._hidden = true;
         if (self.renders) self.render();
@@ -1991,14 +1999,14 @@ Screen.prototype.cursorShape = function(shape, blink) {
     if (!this.program.showCursor_old) {
       var showCursor = this.program.showCursor;
       this.program.showCursor_old = this.program.showCursor;
-      this.program.showCursor = function() {
+      this.program.showCursor = function () {
         self.cursor._hidden = false;
         if (self.program._exiting) showCursor.call(self.program);
         if (self.renders) self.render();
       };
     }
     if (!this._cursorBlink) {
-      this._cursorBlink = setInterval(function() {
+      this._cursorBlink = setInterval(function () {
         if (!self.cursor.blink) return;
         self.cursor._state ^= 1;
         if (self.renders) self.render();
@@ -2013,10 +2021,8 @@ Screen.prototype.cursorShape = function(shape, blink) {
   return this.program.cursorShape(this.cursor.shape, this.cursor.blink);
 };
 
-Screen.prototype.cursorColor = function(color) {
-  this.cursor.color = color != null
-    ? colors.convert(color)
-    : null;
+Screen.prototype.cursorColor = function (color) {
+  this.cursor.color = color != null ? colors.convert(color) : null;
   this.cursor._set = true;
 
   if (this.cursor.artificial) {
@@ -2026,8 +2032,7 @@ Screen.prototype.cursorColor = function(color) {
   return this.program.cursorColor(colors.ncolors[this.cursor.color]);
 };
 
-Screen.prototype.cursorReset =
-Screen.prototype.resetCursor = function() {
+Screen.prototype.cursorReset = Screen.prototype.resetCursor = function () {
   this.cursor.shape = 'block';
   this.cursor.blink = false;
   this.cursor.color = null;
@@ -2053,10 +2058,10 @@ Screen.prototype.resetCursor = function() {
   return this.program.cursorReset();
 };
 
-Screen.prototype._cursorAttr = function(cursor, dattr) {
-  var attr = dattr || this.dattr
-    , cattr
-    , ch;
+Screen.prototype._cursorAttr = function (cursor, dattr) {
+  var attr = dattr || this.dattr,
+    cattr,
+    ch;
 
   if (cursor.shape === 'line') {
     attr &= ~(0x1ff << 9);
@@ -2073,9 +2078,13 @@ Screen.prototype._cursorAttr = function(cursor, dattr) {
   } else if (typeof cursor.shape === 'object' && cursor.shape) {
     cattr = Element.prototype.sattr.call(cursor, cursor.shape);
 
-    if (cursor.shape.bold || cursor.shape.underline
-        || cursor.shape.blink || cursor.shape.inverse
-        || cursor.shape.invisible) {
+    if (
+      cursor.shape.bold ||
+      cursor.shape.underline ||
+      cursor.shape.blink ||
+      cursor.shape.inverse ||
+      cursor.shape.invisible
+    ) {
       attr &= ~(0x1ff << 18);
       attr |= ((cattr >> 18) & 0x1ff) << 18;
     }
@@ -2106,7 +2115,7 @@ Screen.prototype._cursorAttr = function(cursor, dattr) {
   };
 };
 
-Screen.prototype.screenshot = function(xi, xl, yi, yl, term) {
+Screen.prototype.screenshot = function (xi, xl, yi, yl, term) {
   if (xi == null) xi = 0;
   if (xl == null) xl = this.cols;
   if (yi == null) yi = 0;
@@ -2115,13 +2124,7 @@ Screen.prototype.screenshot = function(xi, xl, yi, yl, term) {
   if (xi < 0) xi = 0;
   if (yi < 0) yi = 0;
 
-  var x
-    , y
-    , line
-    , out
-    , ch
-    , data
-    , attr;
+  var x, y, line, out, ch, data, attr;
 
   var sdattr = this.dattr;
 
@@ -2132,9 +2135,7 @@ Screen.prototype.screenshot = function(xi, xl, yi, yl, term) {
   var main = '';
 
   for (y = yi; y < yl; y++) {
-    line = term
-      ? term.lines[y]
-      : this.lines[y];
+    line = term ? term.lines[y] : this.lines[y];
 
     if (!line) break;
 
@@ -2197,7 +2198,7 @@ Screen.prototype.screenshot = function(xi, xl, yi, yl, term) {
  * Positioning
  */
 
-Screen.prototype._getPos = function() {
+Screen.prototype._getPos = function () {
   return this;
 };
 
@@ -2216,7 +2217,7 @@ var angles = {
   '\u2534': true, // '┴'
   '\u252c': true, // '┬'
   '\u2502': true, // '│'
-  '\u2500': true  // '─'
+  '\u2500': true // '─'
 };
 
 var langles = {
@@ -2226,7 +2227,7 @@ var langles = {
   '\u251c': true, // '├'
   '\u2534': true, // '┴'
   '\u252c': true, // '┬'
-  '\u2500': true  // '─'
+  '\u2500': true // '─'
 };
 
 var uangles = {
@@ -2236,7 +2237,7 @@ var uangles = {
   '\u251c': true, // '├'
   '\u2524': true, // '┤'
   '\u252c': true, // '┬'
-  '\u2502': true  // '│'
+  '\u2502': true // '│'
 };
 
 var rangles = {
@@ -2246,7 +2247,7 @@ var rangles = {
   '\u2524': true, // '┤'
   '\u2534': true, // '┴'
   '\u252c': true, // '┬'
-  '\u2500': true  // '─'
+  '\u2500': true // '─'
 };
 
 var dangles = {
@@ -2256,7 +2257,7 @@ var dangles = {
   '\u251c': true, // '├'
   '\u2524': true, // '┤'
   '\u2534': true, // '┴'
-  '\u2502': true  // '│'
+  '\u2502': true // '│'
 };
 
 // var cdangles = {
@@ -2275,17 +2276,17 @@ var angleTable = {
   '0101': '\u2502', // '│'
   '0110': '\u2514', // '└'
   '0111': '\u251c', // '├'
-  '1000': '\u2500', // '─' // ??
-  '1001': '\u2510', // '┐'
-  '1010': '\u2500', // '─' // ??
-  '1011': '\u252c', // '┬'
-  '1100': '\u2518', // '┘'
-  '1101': '\u2524', // '┤'
-  '1110': '\u2534', // '┴'
-  '1111': '\u253c'  // '┼'
+  1000: '\u2500', // '─' // ??
+  1001: '\u2510', // '┐'
+  1010: '\u2500', // '─' // ??
+  1011: '\u252c', // '┬'
+  1100: '\u2518', // '┘'
+  1101: '\u2524', // '┤'
+  1110: '\u2534', // '┴'
+  1111: '\u253c' // '┼'
 };
 
-Object.keys(angleTable).forEach(function(key) {
+Object.keys(angleTable).forEach(function (key) {
   angleTable[parseInt(key, 2)] = angleTable[key];
   delete angleTable[key];
 });

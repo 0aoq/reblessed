@@ -20,7 +20,7 @@ function Box(options) {
     return new Box(options);
   }
   options = options || {};
-  
+
   Element.call(this, options);
 }
 

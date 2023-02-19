@@ -30,14 +30,14 @@ function Button(options) {
 
   Input.call(this, options);
 
-  this.on('keypress', function(ch, key) {
+  this.on('keypress', function (ch, key) {
     if (key.name === 'enter' || key.name === 'space') {
       return self.press();
     }
   });
 
   if (this.options.mouse) {
-    this.on('click', function() {
+    this.on('click', function () {
       return self.press();
     });
   }
@@ -47,7 +47,7 @@ Button.prototype.__proto__ = Input.prototype;
 
 Button.prototype.type = 'button';
 
-Button.prototype.press = function() {
+Button.prototype.press = function () {
   this.focus();
   this.value = true;
   var result = this.emit('press');

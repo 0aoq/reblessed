@@ -43,14 +43,18 @@ function Node(options) {
       // This _should_ work in most cases as long as the element is appended
       // synchronously after the screen's creation. Throw error if not.
       this.screen = Screen.instances[Screen.instances.length - 1];
-      process.nextTick(function() {
+      process.nextTick(function () {
         if (!self.parent) {
-          throw new Error('Element (' + self.type + ')'
-            + ' was not appended synchronously after the'
-            + ' screen\'s creation. Please set a `parent`'
-            + ' or `screen` option in the element\'s constructor'
-            + ' if you are going to use multiple screens and'
-            + ' append the element later.');
+          throw new Error(
+            'Element (' +
+              self.type +
+              ')' +
+              ' was not appended synchronously after the' +
+              " screen's creation. Please set a `parent`" +
+              " or `screen` option in the element's constructor" +
+              ' if you are going to use multiple screens and' +
+              ' append the element later.'
+          );
         }
       });
     } else {
@@ -81,11 +85,11 @@ Node.prototype.__proto__ = EventEmitter.prototype;
 
 Node.prototype.type = 'node';
 
-Node.prototype.insert = function(element, i) {
+Node.prototype.insert = function (element, i) {
   var self = this;
 
   if (element.screen && element.screen !== this.screen) {
-    throw new Error('Cannot switch a node\'s screen.');
+    throw new Error("Cannot switch a node's screen.");
   }
 
   element.detach();
@@ -115,25 +119,25 @@ Node.prototype.insert = function(element, i) {
   }
 };
 
-Node.prototype.prepend = function(element) {
+Node.prototype.prepend = function (element) {
   this.insert(element, 0);
 };
 
-Node.prototype.append = function(element) {
+Node.prototype.append = function (element) {
   this.insert(element, this.children.length);
 };
 
-Node.prototype.insertBefore = function(element, other) {
+Node.prototype.insertBefore = function (element, other) {
   var i = this.children.indexOf(other);
   if (~i) this.insert(element, i);
 };
 
-Node.prototype.insertAfter = function(element, other) {
+Node.prototype.insertAfter = function (element, other) {
   var i = this.children.indexOf(other);
   if (~i) this.insert(element, i + 1);
 };
 
-Node.prototype.remove = function(element) {
+Node.prototype.remove = function (element) {
   if (element.parent !== this) return;
 
   var i = this.children.indexOf(element);
@@ -165,24 +169,24 @@ Node.prototype.remove = function(element) {
   }
 };
 
-Node.prototype.detach = function() {
+Node.prototype.detach = function () {
   if (this.parent) this.parent.remove(this);
 };
 
-Node.prototype.free = function() {
+Node.prototype.free = function () {
   return;
 };
 
-Node.prototype.destroy = function() {
+Node.prototype.destroy = function () {
   this.detach();
-  this.forDescendants(function(el) {
+  this.forDescendants(function (el) {
     el.free();
     el.destroyed = true;
     el.emit('destroy');
   }, this);
 };
 
-Node.prototype.forDescendants = function(iter, s) {
+Node.prototype.forDescendants = function (iter, s) {
   if (s) iter(this);
   this.children.forEach(function emit(el) {
     iter(el);
@@ -190,59 +194,59 @@ Node.prototype.forDescendants = function(iter, s) {
   });
 };
 
-Node.prototype.forAncestors = function(iter, s) {
+Node.prototype.forAncestors = function (iter, s) {
   var el = this;
   if (s) iter(this);
-  while (el = el.parent) {
+  while ((el = el.parent)) {
     iter(el);
   }
 };
 
-Node.prototype.collectDescendants = function(s) {
+Node.prototype.collectDescendants = function (s) {
   var out = [];
-  this.forDescendants(function(el) {
+  this.forDescendants(function (el) {
     out.push(el);
   }, s);
   return out;
 };
 
-Node.prototype.collectAncestors = function(s) {
+Node.prototype.collectAncestors = function (s) {
   var out = [];
-  this.forAncestors(function(el) {
+  this.forAncestors(function (el) {
     out.push(el);
   }, s);
   return out;
 };
 
-Node.prototype.emitDescendants = function() {
-  var args = Array.prototype.slice(arguments)
-    , iter;
+Node.prototype.emitDescendants = function () {
+  var args = Array.prototype.slice(arguments),
+    iter;
 
   if (typeof args[args.length - 1] === 'function') {
     iter = args.pop();
   }
 
-  return this.forDescendants(function(el) {
+  return this.forDescendants(function (el) {
     if (iter) iter(el);
     el.emit.apply(el, args);
   }, true);
 };
 
-Node.prototype.emitAncestors = function() {
-  var args = Array.prototype.slice(arguments)
-    , iter;
+Node.prototype.emitAncestors = function () {
+  var args = Array.prototype.slice(arguments),
+    iter;
 
   if (typeof args[args.length - 1] === 'function') {
     iter = args.pop();
   }
 
-  return this.forAncestors(function(el) {
+  return this.forAncestors(function (el) {
     if (iter) iter(el);
     el.emit.apply(el, args);
   }, true);
 };
 
-Node.prototype.hasDescendant = function(target) {
+Node.prototype.hasDescendant = function (target) {
   return (function find(el) {
     for (var i = 0; i < el.children.length; i++) {
       if (el.children[i] === target) {
@@ -256,23 +260,23 @@ Node.prototype.hasDescendant = function(target) {
   })(this);
 };
 
-Node.prototype.hasAncestor = function(target) {
+Node.prototype.hasAncestor = function (target) {
   var el = this;
-  while (el = el.parent) {
+  while ((el = el.parent)) {
     if (el === target) return true;
   }
   return false;
 };
 
-Node.prototype.get = function(name, value) {
+Node.prototype.get = function (name, value) {
   if (this.data.hasOwnProperty(name)) {
     return this.data[name];
   }
   return value;
 };
 
-Node.prototype.set = function(name, value) {
-  return this.data[name] = value;
+Node.prototype.set = function (name, value) {
+  return (this.data[name] = value);
 };
 
 /**

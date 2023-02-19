@@ -72,46 +72,53 @@ Prompt.prototype.__proto__ = Box.prototype;
 Prompt.prototype.type = 'prompt';
 
 Prompt.prototype.input =
-Prompt.prototype.setInput =
-Prompt.prototype.readInput = function(text, value, callback) {
-  var self = this;
-  var okay, cancel;
+  Prompt.prototype.setInput =
+  Prompt.prototype.readInput =
+    function (text, value, callback) {
+      var self = this;
+      var okay, cancel;
 
-  if (!callback) {
-    callback = value;
-    value = '';
-  }
+      if (!callback) {
+        callback = value;
+        value = '';
+      }
 
-  // Keep above:
-  // var parent = this.parent;
-  // this.detach();
-  // parent.append(this);
+      // Keep above:
+      // var parent = this.parent;
+      // this.detach();
+      // parent.append(this);
 
-  this.show();
-  this.setContent(' ' + text);
+      this.show();
+      this.setContent(' ' + text);
 
-  this._.input.value = value;
+      this._.input.value = value;
 
-  this.screen.saveFocus();
+      this.screen.saveFocus();
 
-  this._.okay.on('press', okay = function() {
-    self._.input.submit();
-  });
+      this._.okay.on(
+        'press',
+        (okay = function () {
+          self._.input.submit();
+        })
+      );
 
-  this._.cancel.on('press', cancel = function() {
-    self._.input.cancel();
-  });
+      this._.cancel.on(
+        'press',
+        (cancel = function () {
+          self._.input.cancel();
+        })
+      );
 
-  this._.input.readInput(function(err, data) {
-    self.hide();
-    self.screen.restoreFocus();
-    self._.okay.removeListener('press', okay);
-    self._.cancel.removeListener('press', cancel);
-    return callback(err, data);
-  });
+      this._.input.readInput(function (err, data) {
+        self.hide();
+        self.screen.restoreFocus();
+        self._.okay.removeListener('press', okay);
+        self._.cancel.removeListener('press', cancel);
+        return callback(err, data);
+      });
 
-  this.screen.render();
-};
+      this.screen.render();
+    };
 
 /**
  * Expose

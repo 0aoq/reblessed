@@ -68,7 +68,7 @@ function ScrollableBox(options) {
     }
     // Allow controlling of the scrollbar via the mouse:
     if (options.mouse) {
-      this.on('mousedown', function(data) {
+      this.on('mousedown', function (data) {
         if (self._scrollingBar) {
           // Do not allow dragging on the scrollbar:
           delete self.screen._dragging;
@@ -82,42 +82,48 @@ function ScrollableBox(options) {
           delete self.screen._dragging;
           delete self._drag;
           var perc = (y - self.itop) / (self.height - self.iheight);
-          self.setScrollPerc(perc * 100 | 0);
+          self.setScrollPerc((perc * 100) | 0);
           self.screen.render();
           var smd, smu;
           self._scrollingBar = true;
-          self.onScreenEvent('mousedown', smd = function(data) {
-            var y = data.y - self.atop;
-            var perc = y / self.height;
-            self.setScrollPerc(perc * 100 | 0);
-            self.screen.render();
-          });
+          self.onScreenEvent(
+            'mousedown',
+            (smd = function (data) {
+              var y = data.y - self.atop;
+              var perc = y / self.height;
+              self.setScrollPerc((perc * 100) | 0);
+              self.screen.render();
+            })
+          );
           // If mouseup occurs out of the window, no mouseup event fires, and
           // scrollbar will drag again on mousedown until another mouseup
           // occurs.
-          self.onScreenEvent('mouseup', smu = function() {
-            self._scrollingBar = false;
-            self.removeScreenEvent('mousedown', smd);
-            self.removeScreenEvent('mouseup', smu);
-          });
+          self.onScreenEvent(
+            'mouseup',
+            (smu = function () {
+              self._scrollingBar = false;
+              self.removeScreenEvent('mousedown', smd);
+              self.removeScreenEvent('mouseup', smu);
+            })
+          );
         }
       });
     }
   }
 
   if (options.mouse) {
-    this.on('wheeldown', function() {
-      self.scroll(self.height / 2 | 0 || 1);
+    this.on('wheeldown', function () {
+      self.scroll((self.height / 2) | 0 || 1);
       self.screen.render();
     });
-    this.on('wheelup', function() {
-      self.scroll(-(self.height / 2 | 0) || -1);
+    this.on('wheelup', function () {
+      self.scroll(-((self.height / 2) | 0) || -1);
       self.screen.render();
     });
   }
 
   if (options.keys && !options.ignoreKeys) {
-    this.on('keypress', function(ch, key) {
+    this.on('keypress', function (ch, key) {
       if (key.name === 'up' || (options.vi && key.name === 'k')) {
         self.scroll(-1);
         self.screen.render();
@@ -129,12 +135,12 @@ function ScrollableBox(options) {
         return;
       }
       if (options.vi && key.name === 'u' && key.ctrl) {
-        self.scroll(-(self.height / 2 | 0) || -1);
+        self.scroll(-((self.height / 2) | 0) || -1);
         self.screen.render();
         return;
       }
       if (options.vi && key.name === 'd' && key.ctrl) {
-        self.scroll(self.height / 2 | 0 || 1);
+        self.scroll((self.height / 2) | 0 || 1);
         self.screen.render();
         return;
       }
@@ -161,7 +167,7 @@ function ScrollableBox(options) {
     });
   }
 
-  this.on('parsed content', function() {
+  this.on('parsed content', function () {
     self._recalculateIndex();
   });
 
@@ -173,12 +179,12 @@ ScrollableBox.prototype.__proto__ = Box.prototype;
 ScrollableBox.prototype.type = 'scrollable-box';
 
 // XXX Potentially use this in place of scrollable checks elsewhere.
-ScrollableBox.prototype.__defineGetter__('reallyScrollable', function() {
+ScrollableBox.prototype.__defineGetter__('reallyScrollable', function () {
   if (this.shrink) return this.scrollable;
   return this.getScrollHeight() > this.height;
 });
 
-ScrollableBox.prototype._scrollBottom = function() {
+ScrollableBox.prototype._scrollBottom = function () {
   if (!this.scrollable) return 0;
 
   // We could just calculate the children, but we can
@@ -191,7 +197,7 @@ ScrollableBox.prototype._scrollBottom = function() {
     return this.lpos._scrollBottom;
   }
 
-  var bottom = this.children.reduce(function(current, el) {
+  var bottom = this.children.reduce(function (current, el) {
     // el.height alone does not calculate the shrunken height, we need to use
     // getCoords. A shrunken box inside a scrollable element will not grow any
     // larger than the scrollable element's context regardless of how much
@@ -215,38 +221,35 @@ ScrollableBox.prototype._scrollBottom = function() {
   return bottom;
 };
 
-ScrollableBox.prototype.setScroll =
-ScrollableBox.prototype.scrollTo = function(offset, always) {
+ScrollableBox.prototype.setScroll = ScrollableBox.prototype.scrollTo = function (offset, always) {
   // XXX
   // At first, this appeared to account for the first new calculation of childBase:
   this.scroll(0);
   return this.scroll(offset - (this.childBase + this.childOffset), always);
 };
 
-ScrollableBox.prototype.getScroll = function() {
+ScrollableBox.prototype.getScroll = function () {
   return this.childBase + this.childOffset;
 };
 
-ScrollableBox.prototype.scroll = function(offset, always) {
+ScrollableBox.prototype.scroll = function (offset, always) {
   if (!this.scrollable) return;
 
   if (this.detached) return;
 
   // Handle scrolling.
-  var visible = this.height - this.iheight
-    , base = this.childBase
-    , d
-    , p
-    , t
-    , b
-    , max
-    , emax;
+  var visible = this.height - this.iheight,
+    base = this.childBase,
+    d,
+    p,
+    t,
+    b,
+    max,
+    emax;
 
   if (this.alwaysScroll || always) {
     // Semi-workaround
-    this.childOffset = offset > 0
-      ? visible - 1 + offset
-      : offset;
+    this.childOffset = offset > 0 ? visible - 1 + offset : offset;
   } else {
     this.childOffset += offset;
   }
@@ -321,7 +324,7 @@ ScrollableBox.prototype.scroll = function(offset, always) {
   return this.emit('scroll');
 };
 
-ScrollableBox.prototype._recalculateIndex = function() {
+ScrollableBox.prototype._recalculateIndex = function () {
   var max, emax;
 
   if (this.detached || !this.scrollable) {
@@ -345,24 +348,24 @@ ScrollableBox.prototype._recalculateIndex = function() {
   }
 };
 
-ScrollableBox.prototype.resetScroll = function() {
+ScrollableBox.prototype.resetScroll = function () {
   if (!this.scrollable) return;
   this.childOffset = 0;
   this.childBase = 0;
   return this.emit('scroll');
 };
 
-ScrollableBox.prototype.getScrollHeight = function() {
+ScrollableBox.prototype.getScrollHeight = function () {
   return Math.max(this._clines.length, this._scrollBottom());
 };
 
-ScrollableBox.prototype.getScrollPerc = function(s) {
+ScrollableBox.prototype.getScrollPerc = function (s) {
   var pos = this.lpos || this._getCoords();
   if (!pos) return s ? -1 : 0;
 
-  var height = (pos.yl - pos.yi) - this.iheight
-    , i = this.getScrollHeight()
-    , p;
+  var height = pos.yl - pos.yi - this.iheight,
+    i = this.getScrollHeight(),
+    p;
 
   if (height < i) {
     if (this.alwaysScroll) {
@@ -376,11 +379,11 @@ ScrollableBox.prototype.getScrollPerc = function(s) {
   return s ? -1 : 0;
 };
 
-ScrollableBox.prototype.setScrollPerc = function(i) {
+ScrollableBox.prototype.setScrollPerc = function (i) {
   // XXX
   // var m = this.getScrollHeight();
   var m = Math.max(this._clines.length, this._scrollBottom());
-  return this.scrollTo((i / 100) * m | 0);
+  return this.scrollTo(((i / 100) * m) | 0);
 };
 
 /**

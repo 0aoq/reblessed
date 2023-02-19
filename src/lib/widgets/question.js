@@ -62,7 +62,7 @@ Question.prototype.__proto__ = Box.prototype;
 
 Question.prototype.type = 'question';
 
-Question.prototype.ask = function(text, callback) {
+Question.prototype.ask = function (text, callback) {
   var self = this;
   var press, okay, cancel;
 
@@ -74,25 +74,36 @@ Question.prototype.ask = function(text, callback) {
   this.show();
   this.setContent(' ' + text);
 
-  this.onScreenEvent('keypress', press = function(ch, key) {
-    if (key.name === 'mouse') return;
-    if (key.name !== 'enter'
-        && key.name !== 'escape'
-        && key.name !== 'q'
-        && key.name !== 'y'
-        && key.name !== 'n') {
-      return;
-    }
-    done(null, key.name === 'enter' || key.name === 'y');
-  });
+  this.onScreenEvent(
+    'keypress',
+    (press = function (ch, key) {
+      if (key.name === 'mouse') return;
+      if (
+        key.name !== 'enter' &&
+        key.name !== 'escape' &&
+        key.name !== 'q' &&
+        key.name !== 'y' &&
+        key.name !== 'n'
+      ) {
+        return;
+      }
+      done(null, key.name === 'enter' || key.name === 'y');
+    })
+  );
 
-  this._.okay.on('press', okay = function() {
-    done(null, true);
-  });
+  this._.okay.on(
+    'press',
+    (okay = function () {
+      done(null, true);
+    })
+  );
 
-  this._.cancel.on('press', cancel = function() {
-    done(null, false);
-  });
+  this._.cancel.on(
+    'press',
+    (cancel = function () {
+      done(null, false);
+    })
+  );
 
   this.screen.saveFocus();
   this.focus();

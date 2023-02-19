@@ -25,15 +25,14 @@ function RadioSet(options) {
   Box.call(this, options);
 }
 
-Object.defineProperty(RadioSet.prototype, "value", {
+Object.defineProperty(RadioSet.prototype, 'value', {
   get: function value() {
     for (child of this.children) {
       if (child.type === 'radio-button') {
-        if (child.checked)
-          return child.value;
+        if (child.checked) return child.value;
       }
     }
-  },
+  }
 });
 
 RadioSet.prototype.__proto__ = Box.prototype;

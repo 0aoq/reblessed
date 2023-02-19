@@ -8,8 +8,8 @@
  * Modules
  */
 
-var path = require('path')
-  , fs = require('fs');
+var path = require('path'),
+  fs = require('fs');
 
 var helpers = require('../helpers');
 
@@ -41,11 +41,11 @@ function FileManager(options) {
     this._label.setContent(options.label.replace('%path', this.cwd));
   }
 
-  this.on('select', function(item) {
-    var value = item.content.replace(/\{[^{}]+\}/g, '').replace(/@$/, '')
-      , file = path.resolve(self.cwd, value);
+  this.on('select', function (item) {
+    var value = item.content.replace(/\{[^{}]+\}/g, '').replace(/@$/, ''),
+      file = path.resolve(self.cwd, value);
 
-    return fs.stat(file, function(err, stat) {
+    return fs.stat(file, function (err, stat) {
       if (err) {
         return self.emit('error', err, file);
       }
@@ -69,7 +69,7 @@ FileManager.prototype.__proto__ = List.prototype;
 
 FileManager.prototype.type = 'file-manager';
 
-FileManager.prototype.refresh = function(cwd, callback) {
+FileManager.prototype.refresh = function (cwd, callback) {
   if (!callback) {
     callback = cwd;
     cwd = null;
@@ -80,11 +80,9 @@ FileManager.prototype.refresh = function(cwd, callback) {
   if (cwd) this.cwd = cwd;
   else cwd = this.cwd;
 
-  return fs.readdir(cwd, function(err, list) {
+  return fs.readdir(cwd, function (err, list) {
     if (err && err.code === 'ENOENT') {
-      self.cwd = cwd !== process.env.HOME
-        ? process.env.HOME
-        : '/';
+      self.cwd = cwd !== process.env.HOME ? process.env.HOME : '/';
       return self.refresh(callback);
     }
 
@@ -93,20 +91,18 @@ FileManager.prototype.refresh = function(cwd, callback) {
       return self.emit('error', err, cwd);
     }
 
-    var dirs = []
-      , files = [];
+    var dirs = [],
+      files = [];
 
     list.unshift('..');
 
-    list.forEach(function(name) {
-      var f = path.resolve(cwd, name)
-        , stat;
+    list.forEach(function (name) {
+      var f = path.resolve(cwd, name),
+        stat;
 
       try {
         stat = fs.lstatSync(f);
-      } catch (e) {
-        ;
-      }
+      } catch (e) {}
 
       if ((stat && stat.isDirectory()) || name === '..') {
         dirs.push({
@@ -132,7 +128,7 @@ FileManager.prototype.refresh = function(cwd, callback) {
     dirs = helpers.asort(dirs);
     files = helpers.asort(files);
 
-    list = dirs.concat(files).map(function(data) {
+    list = dirs.concat(files).map(function (data) {
       return data.text;
     });
 
@@ -146,17 +142,17 @@ FileManager.prototype.refresh = function(cwd, callback) {
   });
 };
 
-FileManager.prototype.pick = function(cwd, callback) {
+FileManager.prototype.pick = function (cwd, callback) {
   if (!callback) {
     callback = cwd;
     cwd = null;
   }
 
-  var self = this
-    , focused = this.screen.focused === this
-    , hidden = this.hidden
-    , onfile
-    , oncancel;
+  var self = this,
+    focused = this.screen.focused === this,
+    hidden = this.hidden,
+    onfile,
+    oncancel;
 
   function resume() {
     self.removeListener('file', onfile);
@@ -170,17 +166,23 @@ FileManager.prototype.pick = function(cwd, callback) {
     self.screen.render();
   }
 
-  this.on('file', onfile = function(file) {
-    resume();
-    return callback(null, file);
-  });
+  this.on(
+    'file',
+    (onfile = function (file) {
+      resume();
+      return callback(null, file);
+    })
+  );
 
-  this.on('cancel', oncancel = function() {
-    resume();
-    return callback();
-  });
+  this.on(
+    'cancel',
+    (oncancel = function () {
+      resume();
+      return callback();
+    })
+  );
 
-  this.refresh(cwd, function(err) {
+  this.refresh(cwd, function (err) {
     if (err) return callback(err);
 
     if (hidden) {
@@ -196,7 +198,7 @@ FileManager.prototype.pick = function(cwd, callback) {
   });
 };
 
-FileManager.prototype.reset = function(cwd, callback) {
+FileManager.prototype.reset = function (cwd, callback) {
   if (!callback) {
     callback = cwd;
     cwd = null;

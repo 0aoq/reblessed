@@ -22,10 +22,8 @@ function BigText(options) {
     return new BigText(options);
   }
   options = options || {};
-  options.font = options.font
-    || __dirname + '/../../usr/fonts/ter-u14n.json';
-  options.fontBold = options.font
-    || __dirname + '/../../usr/fonts/ter-u14b.json';
+  options.font = options.font || __dirname + '/../../usr/fonts/ter-u14n.json';
+  options.fontBold = options.font || __dirname + '/../../usr/fonts/ter-u14b.json';
   this.fch = options.fch;
   this.ratio = {};
   this.font = this.loadFont(options.font);
@@ -40,10 +38,10 @@ BigText.prototype.__proto__ = Box.prototype;
 
 BigText.prototype.type = 'bigtext';
 
-BigText.prototype.loadFont = function(filename) {
-  var self = this
-    , data
-    , font;
+BigText.prototype.loadFont = function (filename) {
+  var self = this,
+    data,
+    font;
 
   data = JSON.parse(fs.readFileSync(filename, 'utf8'));
 
@@ -58,9 +56,9 @@ BigText.prototype.loadFont = function(filename) {
       lines.pop();
     }
 
-    lines = lines.map(function(line) {
+    lines = lines.map(function (line) {
       var chs = line.split('');
-      chs = chs.map(function(ch) {
+      chs = chs.map(function (ch) {
         return ch === ' ' ? 0 : 1;
       });
       while (chs.length < self.ratio.width) {
@@ -80,7 +78,7 @@ BigText.prototype.loadFont = function(filename) {
     return lines;
   }
 
-  font = Object.keys(data.glyphs).reduce(function(out, ch) {
+  font = Object.keys(data.glyphs).reduce(function (out, ch) {
     var lines = data.glyphs[ch].map;
     out[ch] = convertLetter(ch, lines);
     return out;
@@ -91,39 +89,39 @@ BigText.prototype.loadFont = function(filename) {
   return font;
 };
 
-BigText.prototype.setContent = function(content) {
+BigText.prototype.setContent = function (content) {
   this.content = '';
   this.text = content || '';
 };
 
-BigText.prototype.render = function() {
+BigText.prototype.render = function () {
   if (this.position.width == null || this._shrinkWidth) {
     // if (this.width - this.iwidth < this.ratio.width * this.text.length + 1) {
-      this.position.width = this.ratio.width * this.text.length + 1;
-      this._shrinkWidth = true;
+    this.position.width = this.ratio.width * this.text.length + 1;
+    this._shrinkWidth = true;
     // }
   }
   if (this.position.height == null || this._shrinkHeight) {
     // if (this.height - this.iheight < this.ratio.height + 0) {
-      this.position.height = this.ratio.height + 0;
-      this._shrinkHeight = true;
+    this.position.height = this.ratio.height + 0;
+    this._shrinkHeight = true;
     // }
   }
 
   var coords = this._render();
   if (!coords) return;
 
-  var lines = this.screen.lines
-    , left = coords.xi + this.ileft
-    , top = coords.yi + this.itop
-    , right = coords.xl - this.iright
-    , bottom = coords.yl - this.ibottom;
+  var lines = this.screen.lines,
+    left = coords.xi + this.ileft,
+    top = coords.yi + this.itop,
+    right = coords.xl - this.iright,
+    bottom = coords.yl - this.ibottom;
 
-  var dattr = this.sattr(this.style)
-    , bg = dattr & 0x1ff
-    , fg = (dattr >> 9) & 0x1ff
-    , flags = (dattr >> 18) & 0x1ff
-    , attr = (flags << 18) | (bg << 9) | fg;
+  var dattr = this.sattr(this.style),
+    bg = dattr & 0x1ff,
+    fg = (dattr >> 9) & 0x1ff,
+    flags = (dattr >> 18) & 0x1ff,
+    attr = (flags << 18) | (bg << 9) | fg;
 
   for (var x = left, i = 0; x < right; x += this.ratio.width, i++) {
     var ch = this.text[i];

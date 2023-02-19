@@ -41,14 +41,14 @@ function ANSIImage(options) {
     this.setImage(this.options.file);
   }
 
-  this.screen.on('prerender', function() {
+  this.screen.on('prerender', function () {
     var lpos = self.lpos;
     if (!lpos) return;
     // prevent image from blending with itself if there are alpha channels
     self.screen.clearRegion(lpos.xi, lpos.xl, lpos.yi, lpos.yl);
   });
 
-  this.on('destroy', function() {
+  this.on('destroy', function () {
     self.stop();
   });
 }
@@ -57,25 +57,19 @@ ANSIImage.prototype.__proto__ = Box.prototype;
 
 ANSIImage.prototype.type = 'ansiimage';
 
-ANSIImage.curl = function(url) {
+ANSIImage.curl = function (url) {
   try {
-    return cp.execFileSync('curl',
-      ['-s', '-A', '', url],
-      { stdio: ['ignore', 'pipe', 'ignore'] });
-  } catch (e) {
-    ;
-  }
+    return cp.execFileSync('curl', ['-s', '-A', '', url], { stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch (e) {}
   try {
-    return cp.execFileSync('wget',
-      ['-U', '', '-O', '-', url],
-      { stdio: ['ignore', 'pipe', 'ignore'] });
-  } catch (e) {
-    ;
-  }
+    return cp.execFileSync('wget', ['-U', '', '-O', '-', url], {
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+  } catch (e) {}
   throw new Error('curl or wget failed.');
 };
 
-ANSIImage.prototype.setImage = function(file) {
+ANSIImage.prototype.setImage = function (file) {
   this.file = typeof file === 'string' ? file : null;
 
   if (/^https?:/.test(file)) {
@@ -123,33 +117,33 @@ ANSIImage.prototype.setImage = function(file) {
   }
 };
 
-ANSIImage.prototype.play = function() {
+ANSIImage.prototype.play = function () {
   var self = this;
   if (!this.img) return;
-  return this.img.play(function(bmp, cellmap) {
+  return this.img.play(function (bmp, cellmap) {
     self.cellmap = cellmap;
     self.screen.render();
   });
 };
 
-ANSIImage.prototype.pause = function() {
+ANSIImage.prototype.pause = function () {
   if (!this.img) return;
   return this.img.pause();
 };
 
-ANSIImage.prototype.stop = function() {
+ANSIImage.prototype.stop = function () {
   if (!this.img) return;
   return this.img.stop();
 };
 
-ANSIImage.prototype.clearImage = function() {
+ANSIImage.prototype.clearImage = function () {
   this.stop();
   this.setContent('');
   this.img = null;
   this.cellmap = null;
 };
 
-ANSIImage.prototype.render = function() {
+ANSIImage.prototype.render = function () {
   var coords = this._render();
   if (!coords) return;
 

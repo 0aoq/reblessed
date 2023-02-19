@@ -28,14 +28,13 @@ function RadioButton(options) {
 
   this.value = options.value || false;
 
-  this.on('check', function() {
+  this.on('check', function () {
     var el = self;
-    while (el = el.parent) {
-      if (el.type === 'radio-set'
-          || el.type === 'form') break;
+    while ((el = el.parent)) {
+      if (el.type === 'radio-set' || el.type === 'form') break;
     }
     el = el || self.parent;
-    el.forDescendants(function(el) {
+    el.forDescendants(function (el) {
       if (el.type !== 'radio-button' || el === self) {
         return;
       }
@@ -52,10 +51,10 @@ RadioButton.prototype.__proto__ = Checkbox.prototype;
 
 RadioButton.prototype.type = 'radio-button';
 
-RadioButton.prototype.render = function() {
+RadioButton.prototype.render = function () {
   this.clearPos(true);
   // this.setContent('[' + (this.checked ? '*' : ' ') + '] ' + this.text, true);
-  this.setContent(`[${this.checked ? '*' : ' '}] ${this.text}`, true)
+  this.setContent(`[${this.checked ? '*' : ' '}] ${this.text}`, true);
   return this._render();
 };
 

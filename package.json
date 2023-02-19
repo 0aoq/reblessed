@@ -37,10 +37,13 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "tsc"
+    "watch": "tsc -w",
+    "build": "tsc",
+    "format": "prettier src/lib/ -w"
   },
   "devDependencies": {
     "@types/node": "^8.10.66",
+    "prettier": "^2.8.4",
     "typescript": "^4.8.4"
   }
 }

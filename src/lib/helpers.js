@@ -17,15 +17,15 @@ var unicode = require('./unicode');
 
 var helpers = exports;
 
-helpers.merge = function(a, b) {
+helpers.merge = function (a, b) {
   for (var key in b) {
     a[key] = b[key];
   }
   return a;
 };
 
-helpers.asort = function(obj) {
-  return obj.sort(function(a, b) {
+helpers.asort = function (obj) {
+  return obj.sort(function (a, b) {
     a = a.name.toLowerCase();
     b = b.name.toLowerCase();
 
@@ -37,20 +37,19 @@ helpers.asort = function(obj) {
       b = b[0];
     }
 
-    return a > b ? 1 : (a < b ? -1 : 0);
+    return a > b ? 1 : a < b ? -1 : 0;
   });
 };
 
-helpers.hsort = function(obj) {
+helpers.hsort = function (obj) {
   return obj.sort((a, b) => b.index - a.index);
 };
 
-helpers.findFile = function(start, target) {
+helpers.findFile = function (start, target) {
   return (function read(dir) {
     var files, file, stat, out;
 
-    if (dir === '/dev' || dir === '/sys'
-        || dir === '/proc' || dir === '/net') {
+    if (dir === '/dev' || dir === '/sys' || dir === '/proc' || dir === '/net') {
       return null;
     }
 
@@ -64,8 +63,7 @@ helpers.findFile = function(start, target) {
       file = files[i];
 
       var path = (dir === '/' ? '' : dir) + '/' + file;
-      if (file === target)
-        return path;
+      if (file === target) return path;
 
       try {
         stat = fs.lstatSync(path);
@@ -84,22 +82,24 @@ helpers.findFile = function(start, target) {
 };
 
 // Escape text for tag-enabled elements.
-helpers.escape = function(text) {
-  return text.replace(/[{}]/g, function(ch) {
+helpers.escape = function (text) {
+  return text.replace(/[{}]/g, function (ch) {
     return ch === '{' ? '{open}' : '{close}';
   });
 };
 
-helpers.parseTags = function(text, screen) {
+helpers.parseTags = function (text, screen) {
   return helpers.Element.prototype._parseTags.call(
-    { parseTags: true, screen: screen || helpers.Screen.global }, text);
+    { parseTags: true, screen: screen || helpers.Screen.global },
+    text
+  );
 };
 
-helpers.generateTags = function(style, text) {
-  var open = ''
-    , close = '';
+helpers.generateTags = function (style, text) {
+  var open = '',
+    close = '';
 
-  Object.keys(style || {}).forEach(function(key) {
+  Object.keys(style || {}).forEach(function (key) {
     var val = style[key];
     if (typeof val === 'string') {
       val = val.replace(/^light(?!-)/, 'light-');
@@ -124,22 +124,20 @@ helpers.generateTags = function(style, text) {
   };
 };
 
-helpers.attrToBinary = function(style, element) {
+helpers.attrToBinary = function (style, element) {
   return helpers.Element.prototype.sattr.call(element || {}, style);
 };
 
-helpers.stripTags = function(text) {
+helpers.stripTags = function (text) {
   if (!text) return '';
-  return text
-    .replace(/{(\/?)([\w\-,;!#]*)}/g, '')
-    .replace(/\x1b\[[\d;]*m/g, '');
+  return text.replace(/{(\/?)([\w\-,;!#]*)}/g, '').replace(/\x1b\[[\d;]*m/g, '');
 };
 
-helpers.cleanTags = function(text) {
+helpers.cleanTags = function (text) {
   return helpers.stripTags(text).trim();
 };
 
-helpers.dropUnicode = function(text) {
+helpers.dropUnicode = function (text) {
   if (!text) return '';
   return text
     .replace(unicode.chars.all, '??')
@@ -147,14 +145,14 @@ helpers.dropUnicode = function(text) {
     .replace(unicode.chars.surrogate, '?');
 };
 
-helpers.__defineGetter__('Screen', function() {
+helpers.__defineGetter__('Screen', function () {
   if (!helpers._screen) {
     helpers._screen = require('./widgets/screen');
   }
   return helpers._screen;
 });
 
-helpers.__defineGetter__('Element', function() {
+helpers.__defineGetter__('Element', function () {
   if (!helpers._element) {
     helpers._element = require('./widgets/element');
   }

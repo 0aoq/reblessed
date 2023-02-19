@@ -4,16 +4,16 @@
  * https://github.com/chjj/blessed
  */
 
-exports.match = function(r1, g1, b1) {
+exports.match = function (r1, g1, b1) {
   if (typeof r1 === 'string') {
     var hex = r1;
     if (hex[0] !== '#') {
       return -1;
     }
     hex = exports.hexToRGB(hex);
-    r1 = hex[0], g1 = hex[1], b1 = hex[2];
+    (r1 = hex[0]), (g1 = hex[1]), (b1 = hex[2]);
   } else if (Array.isArray(r1)) {
-    b1 = r1[2], g1 = r1[1], r1 = r1[0];
+    (b1 = r1[2]), (g1 = r1[1]), (r1 = r1[0]);
   }
 
   var hash = (r1 << 16) | (g1 << 8) | b1;
@@ -22,14 +22,14 @@ exports.match = function(r1, g1, b1) {
     return exports._cache[hash];
   }
 
-  var ldiff = Infinity
-    , li = -1
-    , i = 0
-    , c
-    , r2
-    , g2
-    , b2
-    , diff;
+  var ldiff = Infinity,
+    li = -1,
+    i = 0,
+    c,
+    r2,
+    g2,
+    b2,
+    diff;
 
   for (; i < exports.vcolors.length; i++) {
     c = exports.vcolors[i];
@@ -50,10 +50,10 @@ exports.match = function(r1, g1, b1) {
     }
   }
 
-  return exports._cache[hash] = li;
+  return (exports._cache[hash] = li);
 };
 
-exports.RGBToHex = function(r, g, b) {
+exports.RGBToHex = function (r, g, b) {
   var cond = Array.isArray(r);
   b = cond ? r[2] : b;
   g = cond ? r[1] : g;
@@ -61,27 +61,23 @@ exports.RGBToHex = function(r, g, b) {
 
   function hex(n) {
     n = n.toString(16);
-    if (n.length < 2)
-      n = '0' + n;
+    if (n.length < 2) n = '0' + n;
     return n;
   }
 
   // return '#' + hex(r) + hex(g) + hex(b);
-  return `#${hex(r)}${hex(g)}${hex(b)}`
+  return `#${hex(r)}${hex(g)}${hex(b)}`;
 };
 
-exports.hexToRGB = function(hex) {
+exports.hexToRGB = function (hex) {
   if (hex.length === 4) {
-    hex = hex[0]
-      + hex[1] + hex[1]
-      + hex[2] + hex[2]
-      + hex[3] + hex[3];
+    hex = hex[0] + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
   }
 
-  var col = parseInt(hex.substring(1), 16)
-    , r = (col >> 16) & 0xff
-    , g = (col >> 8) & 0xff
-    , b = col & 0xff;
+  var col = parseInt(hex.substring(1), 16),
+    r = (col >> 16) & 0xff,
+    g = (col >> 8) & 0xff,
+    b = col & 0xff;
 
   return [r, g, b];
 };
@@ -92,18 +88,13 @@ exports.hexToRGB = function(hex) {
 // propose a superior solution.
 // [1] http://stackoverflow.com/questions/1633828
 
-function colorDistance(
-  r1, g1, b1,
-  r2, g2, b2
-) {
-  return Math.pow(30 * (r1 - r2), 2)
-    + Math.pow(59 * (g1 - g2), 2)
-    + Math.pow(11 * (b1 - b2), 2);
+function colorDistance(r1, g1, b1, r2, g2, b2) {
+  return Math.pow(30 * (r1 - r2), 2) + Math.pow(59 * (g1 - g2), 2) + Math.pow(11 * (b1 - b2), 2);
 }
 
 // This might work well enough for a terminal's colors: treat RGB as XYZ in a
 // 3-dimensional space and go midway between the two points.
-exports.mixColors = function(c1, c2, alpha) {
+exports.mixColors = function (c1, c2, alpha) {
   // if (c1 === 0x1ff) return c1;
   // if (c2 === 0x1ff) return c1;
   c1 = c1 === 0x1ff ? 0 : c1;
@@ -120,9 +111,9 @@ exports.mixColors = function(c1, c2, alpha) {
   var g2 = c2[1];
   var b2 = c2[2];
 
-  r1 += (r2 - r1) * alpha | 0;
-  g1 += (g2 - g1) * alpha | 0;
-  b1 += (b2 - b1) * alpha | 0;
+  r1 += ((r2 - r1) * alpha) | 0;
+  g1 += ((g2 - g1) * alpha) | 0;
+  b1 += ((b2 - b1) * alpha) | 0;
 
   return exports.match([r1, g1, b1]);
 };
@@ -139,8 +130,8 @@ exports.blend = function blend(attr, attr2, alpha) {
   } else {
     if (blend._cache[bg] != null) {
       bg = blend._cache[bg];
-    // } else if (bg < 8) {
-    //   bg += 8;
+      // } else if (bg < 8) {
+      //   bg += 8;
     } else if (bg >= 8 && bg <= 15) {
       bg -= 8;
     } else {
@@ -179,8 +170,8 @@ exports.blend = function blend(attr, attr2, alpha) {
   } else {
     if (blend._cache[fg] != null) {
       fg = blend._cache[fg];
-    // } else if (fg < 8) {
-    //   fg += 8;
+      // } else if (fg < 8) {
+      //   fg += 8;
     } else if (fg >= 8 && fg <= 15) {
       fg -= 8;
     } else {
@@ -211,7 +202,7 @@ exports.blend._cache = {};
 
 exports._cache = {};
 
-exports.reduce = function(color, total) {
+exports.reduce = function (color, total) {
   if (color >= 16 && total <= 16) {
     color = exports.ccolors[color];
   } else if (color >= 8 && total <= 8) {
@@ -242,19 +233,19 @@ exports.xterm = [
   '#5c5cff', // rgb:5c/5c/ff
   '#ff00ff', // magenta
   '#00ffff', // cyan
-  '#ffffff'  // white
+  '#ffffff' // white
 ];
 
 // Seed all 256 colors. Assume xterm defaults.
 // Ported from the xterm color generation script.
-exports.colors = (function() {
-  var cols = exports.colors = []
-    , _cols = exports.vcolors = []
-    , r
-    , g
-    , b
-    , i
-    , l;
+exports.colors = (function () {
+  var cols = (exports.colors = []),
+    _cols = (exports.vcolors = []),
+    r,
+    g,
+    b,
+    i,
+    l;
 
   function hex(n) {
     n = n.toString(16);
@@ -268,7 +259,7 @@ exports.colors = (function() {
   }
 
   // 0 - 15
-  exports.xterm.forEach(function(c, i) {
+  exports.xterm.forEach(function (c, i) {
     c = parseInt(c.substring(1), 16);
     push(i, (c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff);
   });
@@ -277,18 +268,15 @@ exports.colors = (function() {
   for (r = 0; r < 6; r++) {
     for (g = 0; g < 6; g++) {
       for (b = 0; b < 6; b++) {
-        i = 16 + (r * 36) + (g * 6) + b;
-        push(i,
-          r ? (r * 40 + 55) : 0,
-          g ? (g * 40 + 55) : 0,
-          b ? (b * 40 + 55) : 0);
+        i = 16 + r * 36 + g * 6 + b;
+        push(i, r ? r * 40 + 55 : 0, g ? g * 40 + 55 : 0, b ? b * 40 + 55 : 0);
       }
     }
   }
 
   // 232 - 255 are grey.
   for (g = 0; g < 24; g++) {
-    l = (g * 10) + 8;
+    l = g * 10 + 8;
     i = 232 + g;
     push(i, l, l, l);
   }
@@ -298,10 +286,10 @@ exports.colors = (function() {
 
 // Map higher colors to the first 8 colors.
 // This allows translation of high colors to low colors on 8-color terminals.
-exports.ccolors = (function() {
-  var _cols = exports.vcolors.slice()
-    , cols = exports.colors.slice()
-    , out;
+exports.ccolors = (function () {
+  var _cols = exports.vcolors.slice(),
+    cols = exports.colors.slice(),
+    out;
 
   exports.vcolors = exports.vcolors.slice(0, 8);
   exports.colors = exports.colors.slice(0, 8);
@@ -315,7 +303,7 @@ exports.ccolors = (function() {
   return out;
 })();
 
-var colorNames = exports.colorNames = {
+var colorNames = (exports.colorNames = {
   // special
   default: -1,
   normal: -1,
@@ -355,11 +343,10 @@ var colorNames = exports.colorNames = {
   lightgray: 7,
   brightgrey: 7,
   brightgray: 7
-};
+});
 
-exports.convert = function(color) {
+exports.convert = function (color) {
   if (typeof color === 'number') {
-    ;
   } else if (typeof color === 'string') {
     color = color.replace(/[\- ]/g, '');
     if (colorNames[color] != null) {
@@ -429,25 +416,7 @@ exports.ccolors = {
     [190, 194]
   ],
 
-  cyan: [
-    6,
-    14,
-    23,
-    30,
-    37,
-    44,
-    51,
-    66,
-    73,
-    80,
-    87,
-    109,
-    116,
-    123,
-    152,
-    159,
-    195
-  ],
+  cyan: [6, 14, 23, 30, 37, 44, 51, 66, 73, 80, 87, 109, 116, 123, 152, 159, 195],
 
   red: [
     1,
@@ -469,59 +438,19 @@ exports.ccolors = {
     [220, 224]
   ],
 
-  magenta: [
-    5,
-    13,
-    53,
-    90,
-    96,
-    127,
-    133,
-    139,
-    164,
-    170,
-    176,
-    182,
-    201,
-    207,
-    213,
-    219,
-    225
-  ],
+  magenta: [5, 13, 53, 90, 96, 127, 133, 139, 164, 170, 176, 182, 201, 207, 213, 219, 225],
 
-  yellow: [
-    3,
-    11,
-    58,
-    [100, 101],
-    [142, 144],
-    [184, 187],
-    [226, 230]
-  ],
+  yellow: [3, 11, 58, [100, 101], [142, 144], [184, 187], [226, 230]],
 
-  black: [
-    0,
-    8,
-    16,
-    59,
-    102,
-    [232, 243]
-  ],
+  black: [0, 8, 16, 59, 102, [232, 243]],
 
-  white: [
-    7,
-    15,
-    145,
-    188,
-    231,
-    [244, 255]
-  ]
+  white: [7, 15, 145, 188, 231, [244, 255]]
 };
 
 exports.ncolors = [];
 
-Object.keys(exports.ccolors).forEach(function(name) {
-  exports.ccolors[name].forEach(function(offset) {
+Object.keys(exports.ccolors).forEach(function (name) {
+  exports.ccolors[name].forEach(function (offset) {
     if (typeof offset === 'number') {
       exports.ncolors[offset] = name;
       exports.ccolors[offset] = exports.colorNames[name];

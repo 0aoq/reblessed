@@ -30,14 +30,12 @@ function Log(options) {
 
   ScrollableText.call(this, options);
 
-  this.scrollback = options.scrollback != null
-    ? options.scrollback
-    : Infinity;
+  this.scrollback = options.scrollback != null ? options.scrollback : Infinity;
   this.scrollOnInput = options.scrollOnInput;
 
-  this.on('set content', function() {
+  this.on('set content', function () {
     if (!self._userScrolled || self.scrollOnInput) {
-      nextTick(function() {
+      nextTick(function () {
         self.setScrollPerc(100);
         self._userScrolled = false;
         self.screen.render();
@@ -50,8 +48,7 @@ Log.prototype.__proto__ = ScrollableText.prototype;
 
 Log.prototype.type = 'log';
 
-Log.prototype.log =
-Log.prototype.add = function() {
+Log.prototype.log = Log.prototype.add = function () {
   var args = Array.prototype.slice.call(arguments);
   if (typeof args[0] === 'object') {
     args[0] = util.inspect(args[0], true, 20, true);
@@ -66,7 +63,7 @@ Log.prototype.add = function() {
 };
 
 Log.prototype._scroll = Log.prototype.scroll;
-Log.prototype.scroll = function(offset, always) {
+Log.prototype.scroll = function (offset, always) {
   if (offset === 0) return this._scroll(offset, always);
   this._userScrolled = true;
   var ret = this._scroll(offset, always);

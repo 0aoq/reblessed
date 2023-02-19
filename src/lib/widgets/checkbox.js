@@ -29,7 +29,7 @@ function Checkbox(options) {
   this.text = options.content || options.text || '';
   this.checked = this.value = options.checked || false;
 
-  this.on('keypress', function(ch, key) {
+  this.on('keypress', function (ch, key) {
     if (key.name === 'enter' || key.name === 'space') {
       self.toggle();
       self.screen.render();
@@ -37,13 +37,13 @@ function Checkbox(options) {
   });
 
   if (options.mouse) {
-    this.on('click', function() {
+    this.on('click', function () {
       self.toggle();
       self.screen.render();
     });
   }
 
-  this.on('focus', function() {
+  this.on('focus', function () {
     var lpos = self.lpos;
     if (!lpos) return;
     self.screen.program.lsaveCursor('checkbox');
@@ -51,7 +51,7 @@ function Checkbox(options) {
     self.screen.program.showCursor();
   });
 
-  this.on('blur', function() {
+  this.on('blur', function () {
     self.screen.program.lrestoreCursor('checkbox', true);
   });
 }
@@ -60,28 +60,26 @@ Checkbox.prototype.__proto__ = Input.prototype;
 
 Checkbox.prototype.type = 'checkbox';
 
-Checkbox.prototype.render = function() {
+Checkbox.prototype.render = function () {
   this.clearPos(true);
   this.setContent('[' + (this.checked ? 'x' : ' ') + '] ' + this.text, true);
   return this._render();
 };
 
-Checkbox.prototype.check = function() {
+Checkbox.prototype.check = function () {
   if (this.checked) return;
   this.checked = this.value = true;
   this.emit('check');
 };
 
-Checkbox.prototype.uncheck = function() {
+Checkbox.prototype.uncheck = function () {
   if (!this.checked) return;
   this.checked = this.value = false;
   this.emit('uncheck');
 };
 
-Checkbox.prototype.toggle = function() {
-  this.checked
-    ? this.uncheck()
-    : this.check();
+Checkbox.prototype.toggle = function () {
+  this.checked ? this.uncheck() : this.check();
   this.emit('input');
 };
 

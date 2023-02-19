@@ -40,7 +40,7 @@ Loading.prototype.__proto__ = Box.prototype;
 
 Loading.prototype.type = 'loading';
 
-Loading.prototype.load = function(text) {
+Loading.prototype.load = function (text) {
   var self = this;
 
   // XXX Keep above:
@@ -57,7 +57,7 @@ Loading.prototype.load = function(text) {
 
   this.screen.lockKeys = true;
 
-  this._.timer = setInterval(function() {
+  this._.timer = setInterval(function () {
     if (self._.icon.content === '|') {
       self._.icon.setContent('/');
     } else if (self._.icon.content === '/') {
@@ -71,7 +71,7 @@ Loading.prototype.load = function(text) {
   }, 200);
 };
 
-Loading.prototype.stop = function() {
+Loading.prototype.stop = function () {
   this.screen.lockKeys = false;
   this.hide();
   if (this._.timer) {

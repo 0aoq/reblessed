@@ -22,10 +22,10 @@ function Layout(options) {
 
   options = options || {};
 
-  if ((options.width == null
-      && (options.left == null && options.right == null))
-      || (options.height == null
-      && (options.top == null && options.bottom == null))) {
+  if (
+    (options.width == null && options.left == null && options.right == null) ||
+    (options.height == null && options.top == null && options.bottom == null)
+  ) {
     throw new Error('`Layout` must have a width and height!');
   }
 
@@ -42,25 +42,24 @@ Layout.prototype.__proto__ = Element.prototype;
 
 Layout.prototype.type = 'layout';
 
-Layout.prototype.isRendered = function(el) {
+Layout.prototype.isRendered = function (el) {
   if (!el.lpos) return false;
-  return (el.lpos.xl - el.lpos.xi) > 0
-      && (el.lpos.yl - el.lpos.yi) > 0;
+  return el.lpos.xl - el.lpos.xi > 0 && el.lpos.yl - el.lpos.yi > 0;
 };
 
-Layout.prototype.getLast = function(i) {
+Layout.prototype.getLast = function (i) {
   while (this.children[--i]) {
     var el = this.children[i];
     if (this.isRendered(el)) return el;
   }
 };
 
-Layout.prototype.getLastCoords = function(i) {
+Layout.prototype.getLastCoords = function (i) {
   var last = this.getLast(i);
   if (last) return last.lpos;
 };
 
-Layout.prototype._renderCoords = function() {
+Layout.prototype._renderCoords = function () {
   var coords = this._getCoords(true);
   var children = this.children;
   this.children = [];
@@ -69,14 +68,14 @@ Layout.prototype._renderCoords = function() {
   return coords;
 };
 
-Layout.prototype.renderer = function(coords) {
+Layout.prototype.renderer = function (coords) {
   var self = this;
 
   // The coordinates of the layout element
-  var width = coords.xl - coords.xi
-    , height = coords.yl - coords.yi
-    , xi = coords.xi
-    , yi = coords.yi;
+  var width = coords.xl - coords.xi,
+    height = coords.yl - coords.yi,
+    xi = coords.xi,
+    yi = coords.yi;
 
   // The current row offset in cells (which row are we on?)
   var rowOffset = 0;
@@ -87,7 +86,7 @@ Layout.prototype.renderer = function(coords) {
 
   // Figure out the highest width child
   if (this.options.layout === 'grid') {
-    var highWidth = this.children.reduce(function(out, el) {
+    var highWidth = this.children.reduce(function (out, el) {
       out = Math.max(out, el.width);
       return out;
     }, 0);
@@ -128,7 +127,7 @@ Layout.prototype.renderer = function(coords) {
         // Otherwise we need to start a new row and calculate a new
         // `rowOffset` and `rowIndex` (the index of the child on the current
         // row).
-        rowOffset += self.children.slice(rowIndex, i).reduce(function(out, el) {
+        rowOffset += self.children.slice(rowIndex, i).reduce(function (out, el) {
           if (!self.isRendered(el)) return out;
           out = Math.max(out, el.lpos.yl - el.lpos.yi);
           return out;
@@ -168,7 +167,7 @@ Layout.prototype.renderer = function(coords) {
   };
 };
 
-Layout.prototype.render = function() {
+Layout.prototype.render = function () {
   this._emit('prerender');
 
   var coords = this._renderCoords();
@@ -191,19 +190,19 @@ Layout.prototype.render = function() {
 
   if (this.border) coords.xi++, coords.xl--, coords.yi++, coords.yl--;
   if (this.tpadding) {
-    coords.xi += this.padding.left, coords.xl -= this.padding.right;
-    coords.yi += this.padding.top, coords.yl -= this.padding.bottom;
+    (coords.xi += this.padding.left), (coords.xl -= this.padding.right);
+    (coords.yi += this.padding.top), (coords.yl -= this.padding.bottom);
   }
 
   var iterator = this.renderer(coords);
 
   if (this.border) coords.xi--, coords.xl++, coords.yi--, coords.yl++;
   if (this.tpadding) {
-    coords.xi -= this.padding.left, coords.xl += this.padding.right;
-    coords.yi -= this.padding.top, coords.yl += this.padding.bottom;
+    (coords.xi -= this.padding.left), (coords.xl += this.padding.right);
+    (coords.yi -= this.padding.top), (coords.yl += this.padding.bottom);
   }
 
-  this.children.forEach(function(el, i) {
+  this.children.forEach(function (el, i) {
     if (el.screen._ci !== -1) {
       el.index = el.screen._ci++;
     }

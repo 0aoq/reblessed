@@ -31,11 +31,13 @@ function Form(options) {
 
   if (options.keys) {
     this.screen._listenKeys(this);
-    this.on('element keypress', function(el, ch, key) {
-      if ((key.name === 'tab' && !key.shift)
-          || (el.type === 'textbox' && options.autoNext && key.name === 'enter')
-          || key.name === 'down'
-          || (options.vi && key.name === 'j')) {
+    this.on('element keypress', function (el, ch, key) {
+      if (
+        (key.name === 'tab' && !key.shift) ||
+        (el.type === 'textbox' && options.autoNext && key.name === 'enter') ||
+        key.name === 'down' ||
+        (options.vi && key.name === 'j')
+      ) {
         if (el.type === 'textbox' || el.type === 'textarea') {
           if (key.name === 'j') return;
           if (key.name === 'tab') {
@@ -48,9 +50,11 @@ function Form(options) {
         return;
       }
 
-      if ((key.name === 'tab' && key.shift)
-          || key.name === 'up'
-          || (options.vi && key.name === 'k')) {
+      if (
+        (key.name === 'tab' && key.shift) ||
+        key.name === 'up' ||
+        (options.vi && key.name === 'k')
+      ) {
         if (el.type === 'textbox' || el.type === 'textarea') {
           if (key.name === 'k') return;
           el.emit('keypress', '\x1b', { name: 'escape' });
@@ -71,7 +75,7 @@ Form.prototype.__proto__ = Box.prototype;
 
 Form.prototype.type = 'form';
 
-Form.prototype._refresh = function() {
+Form.prototype._refresh = function () {
   // XXX Possibly remove this if statement and refresh on every focus.
   // Also potentially only include *visible* focusable elements.
   // This would remove the need to check for _selected.visible in previous()
@@ -88,13 +92,13 @@ Form.prototype._refresh = function() {
   }
 };
 
-Form.prototype._visible = function() {
-  return !!this._children.filter(function(el) {
+Form.prototype._visible = function () {
+  return !!this._children.filter(function (el) {
     return el.visible;
   }).length;
 };
 
-Form.prototype.next = function() {
+Form.prototype.next = function () {
   this._refresh();
 
   if (!this._visible()) return;
@@ -118,7 +122,7 @@ Form.prototype.next = function() {
   return this._selected;
 };
 
-Form.prototype.focusChild = function(elem) {
+Form.prototype.focusChild = function (elem) {
   this._refresh();
 
   if (!this._visible()) return;
@@ -127,10 +131,10 @@ Form.prototype.focusChild = function(elem) {
   var i = this._children.indexOf(elem);
   if (i == -1) return;
   this._selected = this._children[i];
-  this._selected.focus()
-}
+  this._selected.focus();
+};
 
-Form.prototype.previous = function() {
+Form.prototype.previous = function () {
   this._refresh();
 
   if (!this._visible()) return;
@@ -153,7 +157,7 @@ Form.prototype.previous = function() {
   return this._selected;
 };
 
-Form.prototype.focusNext = function() {
+Form.prototype.focusNext = function () {
   var next = this.next();
   if (next) next.focus();
   if (!this.scrollable) return;
@@ -172,11 +176,11 @@ Form.prototype.focusNext = function() {
     to-do: run check on padding to dynamically allocate the
     value.
   */
-  let returnVal = 1
+  let returnVal = 1;
   this.scrollTo(pos.yi - returnVal);
 };
 
-Form.prototype.focusPrevious = function() {
+Form.prototype.focusPrevious = function () {
   var previous = this.previous();
   if (previous) previous.focus();
   if (!this.scrollable) return;
@@ -184,21 +188,21 @@ Form.prototype.focusPrevious = function() {
   this.scrollTo(pos.yi);
 };
 
-Form.prototype.resetSelected = function() {
+Form.prototype.resetSelected = function () {
   this._selected = null;
 };
 
-Form.prototype.focusFirst = function() {
+Form.prototype.focusFirst = function () {
   this.resetSelected();
   this.focusNext();
 };
 
-Form.prototype.focusLast = function() {
+Form.prototype.focusLast = function () {
   this.resetSelected();
   this.focusPrevious();
 };
 
-Form.prototype.submit = function() {
+Form.prototype.submit = function () {
   var out = {};
 
   this.children.forEach(function fn(el) {
@@ -217,14 +221,14 @@ Form.prototype.submit = function() {
 
   this.emit('submit', out);
 
-  return this.submission = out;
+  return (this.submission = out);
 };
 
-Form.prototype.cancel = function() {
+Form.prototype.cancel = function () {
   this.emit('cancel');
 };
 
-Form.prototype.reset = function() {
+Form.prototype.reset = function () {
   this.children.forEach(function fn(el) {
     switch (el.type) {
       case 'screen':

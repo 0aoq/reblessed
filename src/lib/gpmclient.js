@@ -10,18 +10,18 @@ var EventEmitter = require('events').EventEmitter;
 
 var GPM_USE_MAGIC = false;
 
-var GPM_MOVE = 1
-  , GPM_DRAG = 2
-  , GPM_DOWN = 4
-  , GPM_UP = 8;
+var GPM_MOVE = 1,
+  GPM_DRAG = 2,
+  GPM_DOWN = 4,
+  GPM_UP = 8;
 
-var GPM_DOUBLE = 32
-  , GPM_MFLAG = 128;
+var GPM_DOUBLE = 32,
+  GPM_MFLAG = 128;
 
-var GPM_REQ_NOPASTE = 3
-  , GPM_HARD = 256;
+var GPM_REQ_NOPASTE = 3,
+  GPM_HARD = 256;
 
-var GPM_MAGIC = 0x47706D4C;
+var GPM_MAGIC = 0x47706d4c;
 var GPM_SOCKET = '/dev/gpmctl';
 
 // typedef struct Gpm_Connect {
@@ -31,7 +31,7 @@ var GPM_SOCKET = '/dev/gpmctl';
 //   int vc;
 // } Gpm_Connect;
 
-function send_config(socket, Gpm_Connect,  callback) {
+function send_config(socket, Gpm_Connect, callback) {
   var buffer;
   if (GPM_USE_MAGIC) {
     buffer = new Buffer(20);
@@ -51,7 +51,7 @@ function send_config(socket, Gpm_Connect,  callback) {
     buffer.writeInt16LE(Gpm_Connect.pid, 8);
     buffer.writeInt16LE(Gpm_Connect.vc, 12);
   }
-  socket.write(buffer, function() {
+  socket.write(buffer, function () {
     if (callback) callback();
   });
 }
@@ -103,9 +103,7 @@ function GpmClient(options) {
   var path;
   try {
     path = fs.readlinkSync('/proc/' + pid + '/fd/0');
-  } catch (e) {
-    ;
-  }
+  } catch (e) {}
   var tty = /tty[0-9]+$/.exec(path);
   if (tty === null) {
     // TODO: should  also check for /dev/input/..
@@ -120,12 +118,12 @@ function GpmClient(options) {
   var self = this;
 
   if (tty) {
-    fs.stat(GPM_SOCKET, function(err, stat) {
+    fs.stat(GPM_SOCKET, function (err, stat) {
       if (err || !stat.isSocket()) {
         return;
       }
 
-      var conf =  {
+      var conf = {
         eventMask: 0xffff,
         defaultMask: GPM_MOVE | GPM_HARD,
         minMod: 0,
@@ -137,15 +135,15 @@ function GpmClient(options) {
       var gpm = net.createConnection(GPM_SOCKET);
       this.gpm = gpm;
 
-      gpm.on('connect', function() {
-        send_config(gpm, conf, function() {
+      gpm.on('connect', function () {
+        send_config(gpm, conf, function () {
           conf.pid = 0;
           conf.vc = GPM_REQ_NOPASTE;
           //send_config(gpm, conf);
         });
       });
 
-      gpm.on('data', function(packet) {
+      gpm.on('data', function (packet) {
         var evnt = parseEvent(packet);
         switch (evnt.type & 15) {
           case GPM_MOVE:
@@ -153,9 +151,15 @@ function GpmClient(options) {
               self.emit('move', evnt.buttons, evnt.modifiers, evnt.x, evnt.y);
             }
             if (evnt.wdx || evnt.wdy) {
-              self.emit('mousewheel',
-                evnt.buttons, evnt.modifiers,
-                evnt.x, evnt.y, evnt.wdx, evnt.wdy);
+              self.emit(
+                'mousewheel',
+                evnt.buttons,
+                evnt.modifiers,
+                evnt.x,
+                evnt.y,
+                evnt.wdx,
+                evnt.wdy
+              );
             }
             break;
           case GPM_DRAG:
@@ -163,9 +167,15 @@ function GpmClient(options) {
               self.emit('drag', evnt.buttons, evnt.modifiers, evnt.x, evnt.y);
             }
             if (evnt.wdx || evnt.wdy) {
-              self.emit('mousewheel',
-                evnt.buttons, evnt.modifiers,
-                evnt.x, evnt.y, evnt.wdx, evnt.wdy);
+              self.emit(
+                'mousewheel',
+                evnt.buttons,
+                evnt.modifiers,
+                evnt.x,
+                evnt.y,
+                evnt.wdx,
+                evnt.wdy
+              );
             }
             break;
           case GPM_DOWN:
@@ -183,7 +193,7 @@ function GpmClient(options) {
         }
       });
 
-      gpm.on('error', function() {
+      gpm.on('error', function () {
         self.stop();
       });
     });
@@ -192,30 +202,30 @@ function GpmClient(options) {
 
 GpmClient.prototype.__proto__ = EventEmitter.prototype;
 
-GpmClient.prototype.stop = function() {
+GpmClient.prototype.stop = function () {
   if (this.gpm) {
     this.gpm.end();
   }
   delete this.gpm;
 };
 
-GpmClient.prototype.ButtonName =  function(btn) {
+GpmClient.prototype.ButtonName = function (btn) {
   if (btn & 4) return 'left';
   if (btn & 2) return 'middle';
   if (btn & 1) return 'right';
   return '';
 };
 
-GpmClient.prototype.hasShiftKey =  function(mod) {
-  return (mod & 1) ? true : false;
+GpmClient.prototype.hasShiftKey = function (mod) {
+  return mod & 1 ? true : false;
 };
 
-GpmClient.prototype.hasCtrlKey =  function(mod) {
-  return (mod & 4) ? true : false;
+GpmClient.prototype.hasCtrlKey = function (mod) {
+  return mod & 4 ? true : false;
 };
 
-GpmClient.prototype.hasMetaKey =  function(mod) {
-  return (mod & 8) ? true : false;
+GpmClient.prototype.hasMetaKey = function (mod) {
+  return mod & 8 ? true : false;
 };
 
 module.exports = GpmClient;

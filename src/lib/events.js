@@ -14,11 +14,11 @@ function EventEmitter() {
   if (!this._events) this._events = {};
 }
 
-EventEmitter.prototype.setMaxListeners = function(n) {
+EventEmitter.prototype.setMaxListeners = function (n) {
   this._maxListeners = n;
 };
 
-EventEmitter.prototype.addListener = function(type, listener) {
+EventEmitter.prototype.addListener = function (type, listener) {
   if (!this._events[type]) {
     this._events[type] = listener;
   } else if (typeof this._events[type] === 'function') {
@@ -31,7 +31,7 @@ EventEmitter.prototype.addListener = function(type, listener) {
 
 EventEmitter.prototype.on = EventEmitter.prototype.addListener;
 
-EventEmitter.prototype.removeListener = function(type, listener) {
+EventEmitter.prototype.removeListener = function (type, listener) {
   var handler = this._events[type];
   if (!handler) return;
 
@@ -52,7 +52,7 @@ EventEmitter.prototype.removeListener = function(type, listener) {
 
 EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
 
-EventEmitter.prototype.removeAllListeners = function(type) {
+EventEmitter.prototype.removeAllListeners = function (type) {
   if (type) {
     delete this._events[type];
   } else {
@@ -60,7 +60,7 @@ EventEmitter.prototype.removeAllListeners = function(type) {
   }
 };
 
-EventEmitter.prototype.once = function(type, listener) {
+EventEmitter.prototype.once = function (type, listener) {
   function on() {
     this.removeListener(type, on);
     return listener.apply(this, arguments);
@@ -69,15 +69,13 @@ EventEmitter.prototype.once = function(type, listener) {
   return this.on(type, on);
 };
 
-EventEmitter.prototype.listeners = function(type) {
-  return typeof this._events[type] === 'function'
-    ? [this._events[type]]
-    : this._events[type] || [];
+EventEmitter.prototype.listeners = function (type) {
+  return typeof this._events[type] === 'function' ? [this._events[type]] : this._events[type] || [];
 };
 
-EventEmitter.prototype._emit = function(type, args) {
-  var handler = this._events[type]
-    , ret;
+EventEmitter.prototype._emit = function (type, args) {
+  var handler = this._events[type],
+    ret;
 
   // if (type !== 'event') {
   //   this._emit('event', [type.replace(/^element /, '')].concat(args));
@@ -85,7 +83,7 @@ EventEmitter.prototype._emit = function(type, args) {
 
   if (!handler) {
     if (type === 'error') {
-      throw new args[0];
+      throw new args[0]();
     }
     return;
   }
@@ -103,10 +101,10 @@ EventEmitter.prototype._emit = function(type, args) {
   return ret !== false;
 };
 
-EventEmitter.prototype.emit = function(type) {
-  var args = slice.call(arguments, 1)
-    , params = slice.call(arguments)
-    , el = this;
+EventEmitter.prototype.emit = function (type) {
+  var args = slice.call(arguments, 1),
+    params = slice.call(arguments),
+    el = this;
 
   this._emit('event', params);
 
@@ -131,7 +129,7 @@ EventEmitter.prototype.emit = function(type) {
     if (el._emit(type, args) === false) {
       return false;
     }
-  } while (el = el.parent);
+  } while ((el = el.parent));
 
   return true;
 };

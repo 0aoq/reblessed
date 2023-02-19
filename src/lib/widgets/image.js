@@ -27,10 +27,9 @@ function Image(options) {
 
   if (options.type === 'ansi' && this.type !== 'ansiimage') {
     var ANSIImage = require('./ansiimage');
-    Object.getOwnPropertyNames(ANSIImage.prototype).forEach(function(key) {
+    Object.getOwnPropertyNames(ANSIImage.prototype).forEach(function (key) {
       if (key === 'type') return;
-      Object.defineProperty(this, key,
-        Object.getOwnPropertyDescriptor(ANSIImage.prototype, key));
+      Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(ANSIImage.prototype, key));
     }, this);
     ANSIImage.call(this, options);
     return this;
@@ -38,10 +37,13 @@ function Image(options) {
 
   if (options.type === 'overlay' && this.type !== 'overlayimage') {
     var OverlayImage = require('./overlayimage');
-    Object.getOwnPropertyNames(OverlayImage.prototype).forEach(function(key) {
+    Object.getOwnPropertyNames(OverlayImage.prototype).forEach(function (key) {
       if (key === 'type') return;
-      Object.defineProperty(this, key,
-        Object.getOwnPropertyDescriptor(OverlayImage.prototype, key));
+      Object.defineProperty(
+        this,
+        key,
+        Object.getOwnPropertyDescriptor(OverlayImage.prototype, key)
+      );
     }, this);
     OverlayImage.call(this, options);
     return this;
